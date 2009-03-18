@@ -52,7 +52,7 @@ public class STPSolver extends AbstractSolver{
       if (verbose){
         System.out.println();
         System.out.println("size:" + size);
-                System.out.println(c);
+        //                System.out.println(c);
       }
       if (c.getConjuncts().isEmpty())
         return Solution.createSAT();
