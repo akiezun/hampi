@@ -24,6 +24,10 @@ public final class HInExpression extends HBooleanExpression{
     return id2;
   }
 
+  public boolean isIn(){
+    return in;
+  }
+
   @Override
   public String unparse(){
     return id1 + (in ? "" : " not") + " in " + id2;

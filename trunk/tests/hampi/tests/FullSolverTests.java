@@ -59,7 +59,7 @@ public class FullSolverTests extends TestCase{
    * every time. This is very slow but makes a fairer comparison with
    * CFGAnalyzer.
    */
-  private static Pair<Boolean, Long> solveConstraint(String fname){
+  private static Pair<Boolean, Long> solveConstraintNewVM(String fname){
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     PrintStream blackHole = new PrintStream(os);
     StopWatch w = new StopWatch("");
@@ -97,7 +97,7 @@ public class FullSolverTests extends TestCase{
     return Pair.create(!isUNSAT, w.getTotal());
   }
 
-  private static Pair<Boolean, Long> solveConstraint2(String fname) throws IOException{
+  private static Pair<Boolean, Long> solveConstraintInPlace(String fname) throws IOException{
     StopWatch w = new StopWatch("");
     w.start();
     boolean isSat = false;
@@ -115,6 +115,11 @@ public class FullSolverTests extends TestCase{
     }
     w.stop();
     return Pair.create(isSat, w.getTotal());
+  }
+
+  private static Solution solve(String fname) throws Exception{
+    InputStream istream = new ByteArrayInputStream(Files.getFileContents(fname).getBytes());
+    return Hampi.run(false, true, istream);
   }
 
   /**
@@ -137,9 +142,9 @@ public class FullSolverTests extends TestCase{
       if (serverRunning){
         solveConstraint = solveConstraint_client(D + getName() + ".hmp");
       }else if (DEBUG){
-        solveConstraint = solveConstraint2(D + getName() + ".hmp");
+        solveConstraint = solveConstraintInPlace(D + getName() + ".hmp");
       }else{
-        solveConstraint = solveConstraint(D + getName() + ".hmp");
+        solveConstraint = solveConstraintNewVM(D + getName() + ".hmp");
       }
       times[r] = solveConstraint.second;
       sat = solveConstraint.first;
@@ -233,9 +238,15 @@ public class FullSolverTests extends TestCase{
     doTest(true, Double.MAX_VALUE);
   }
 
-  //  public void DISABLEDtestSolveNotIn1() throws Exception{
-  //    doTest();
-  //  }
+  public void testSolveNotIn1() throws Exception{
+    Solution solve = solve(D + getName() + ".hmp");
+    assertEquals("b", solve.getValueForVar("v"));
+  }
+
+  public void testSolveNotContains1() throws Exception{
+    Solution solve = solve(D + getName() + ".hmp");
+    assertEquals("b", solve.getValueForVar("v"));
+  }
 
   public void testCharEncodingFormat() throws Exception{
     doTest(true, 0);
