@@ -77,6 +77,13 @@ public final class Solution{
   }
 
   /**
+   * Returns the value assigned to the variable.
+   */
+  public String getValueForVar(String varName){
+    return getValue(HampiConstraints.varExpr(varName));
+  }
+
+  /**
    * Sets the value assignment. The previous assignment is removed.
    */
   public void setValue(VariableExpression ve, String val){
@@ -105,14 +112,14 @@ public final class Solution{
       for (int i = 0; i < in.length(); i ++) {
 	  sb.append("\\");
 	  sb.append((int)in.charAt(i));
-      } 
+      }
       return sb.toString();
   }
 
   /**
    * Pretty-print assignment
    */
-  private String assignmentToString() { 
+  private String assignmentToString() {
       StringBuffer sb = new StringBuffer();
       sb.append("{");
       for (VariableExpression ve : this.assignment.keySet()) {
@@ -129,15 +136,12 @@ public final class Solution{
   @Override
   public String toString() {
       boolean printord = HampiOptions.INSTANCE.get("printOrd").equals("yes");
-      if (!isSatisfiable()) {
-	  return "UNSAT";
-      }
-      else if (printord) {
-	  return assignmentToString();
-      }
-      else {
-	  return this.assignment.toString();
-      }
+      if (!isSatisfiable())
+        return "UNSAT";
+      else if (printord)
+        return assignmentToString();
+      else
+        return this.assignment.toString();
   }
 
   @Override

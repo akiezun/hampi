@@ -259,7 +259,7 @@ public final class Hampi{
     run(check, verbose, istream);
   }
 
-  public static void run(boolean check, boolean verbose, InputStream istream) throws IOException,RecognitionException{
+  public static Solution run(boolean check, boolean verbose, InputStream istream) throws IOException,RecognitionException{
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     StopWatch parseTimer = new StopWatch("parsing");
     parseTimer.start();
@@ -286,6 +286,7 @@ public final class Hampi{
     if (!solve.isSatisfiable())
       throw HampiResultException.unsat();
     System.out.println(solve);
+    return solve;
   }
 
 }

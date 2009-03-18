@@ -22,7 +22,7 @@ public class STPSolver extends AbstractSolver{
   /**
    * If true, Hampi calls STP separately for each conjuction, otherwise Hampi
    * puts all conjunctions in 1 STP formula with disjunction.
-   * XXX this is not fully implemented yet. 
+   * XXX this is not fully implemented yet.
    */
   public static final boolean INCREMENTAL = false;
 
@@ -52,7 +52,7 @@ public class STPSolver extends AbstractSolver{
       if (verbose){
         System.out.println();
         System.out.println("size:" + size);
-        //        System.out.println(c);
+                System.out.println(c);
       }
       if (c.getConjuncts().isEmpty())
         return Solution.createSAT();

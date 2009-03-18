@@ -55,7 +55,7 @@ public final class HConstraintPreparer{
     Regexp sigmaStar = hampi.starRegexp(sigma);
     Regexp contains = hampi.concatRegexp(sigmaStar, hampi.constRegexp(string), sigmaStar);
     Expression varExpr = getExpandedExpression(varName, ast);
-    return hampi.regexpConstraint(varExpr, true, contains);
+    return hampi.regexpConstraint(varExpr, containsExpr.contains(), contains);
   }
 
   /**
@@ -111,7 +111,7 @@ public final class HConstraintPreparer{
     Expression e1 = getExpandedExpression(inExpr.getVarName(), ast);
     Regexp reg = prepareRegForVar(inExpr.getRegVarName(), ast);
     assert reg != null : "null reg for " + inExpr.getRegVarName();
-    return hampi.regexpConstraint(e1, true, reg);
+    return hampi.regexpConstraint(e1, inExpr.isIn(), reg);
   }
 
   private Regexp prepareRegForVar(String varName, HProgram ast){
