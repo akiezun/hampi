@@ -87,6 +87,7 @@ public final class Solution{
    * Sets the value assignment. The previous assignment is removed.
    */
   public void setValue(VariableExpression ve, String val){
+    assert isSatisfiable() : "can't set values in UNSAT solutions";
     assignment.put(ve, val);
   }
 
