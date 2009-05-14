@@ -78,6 +78,20 @@ public final class HProgram extends HAbstractGrammarElement{
   }
 
   /**
+   * Returns the CFG statement for the given nonterminal name.
+   */
+  public CFGStatement getCFGDecl(String nonterminal){
+    for (HStatement s : statements){
+      if (s.getKind() == HGrammarElementKind.STMT_CFG){
+        CFGStatement cfgDecl = (CFGStatement) s;
+        if (nonterminal.contains(cfgDecl.getVarName()))
+          return cfgDecl;
+      }
+    }
+    return null;
+  }
+
+  /**
    * Returns the CFG statements for the given nonterminal names.
    */
   public Set<CFGStatement> getCFGDecls(Set<String> nonterminals){

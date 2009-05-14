@@ -66,7 +66,7 @@ public class HampiWellFormednessTests extends TestCase{
   }
 
   public void testTypecheck1() throws Exception{
-    checkFail("testTypecheck1.txt", "not reg used in 'in'");
+    checkPass("testTypecheck1.txt");
   }
 
   public void testTypecheckFul() throws Exception{
