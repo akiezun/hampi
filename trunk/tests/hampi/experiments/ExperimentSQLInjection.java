@@ -53,9 +53,9 @@ public final class ExperimentSQLInjection{
       runHampi(i, hampiResults);
       //      runCFGAnalyzer(i, cfgResults);
 
-      SolverExperimentResultSet<Double> timeRatio = SolverExperimentResultSet.timeRatio(cfgResults, hampiResults, 0);
-      HampiExperiments.createResultGraphs(hampiResults, cfgResults, "sqli", timeRatio, outputDir);
-      HampiExperiments.printInRatioOrder(i, timeRatio);
+      //SolverExperimentResultSet<Double> timeRatio = SolverExperimentResultSet.timeRatio(cfgResults, hampiResults, 0);
+      //HampiExperiments.createResultGraphs(hampiResults, cfgResults, "sqli", timeRatio, outputDir);
+      //HampiExperiments.printInRatioOrder(i, timeRatio);
     }
   }
 
@@ -71,6 +71,7 @@ public final class ExperimentSQLInjection{
    * query, and contains the bad string. The attack string v is then simply
    * extracted by dropping s1 and s2 from front and end.
    */
+  /*
   private static void runCFGAnalyzer(int n, SolverExperimentResultSet<Pair<Boolean, Double>> cfgResults) throws IOException{
     System.out.println(n);
     String tinySQLGrammar = tinySQLGrammar();
@@ -94,10 +95,8 @@ public final class ExperimentSQLInjection{
         System.out.println(bad);
         Pair<Boolean, Double> p = CFGAnalyzer.runIntersection(size, out, sqlGrammarFile, queryGrammarFile, badStringGrammarFile);
         cfgResults.addResult(resultName(query, bad), n, p);
-        //        if (p.first){
         System.out.println("cfg " + p);
         System.out.println(out);
-        //        }
         System.out.println("-----------------------");
         badStringGrammarFile.delete();
       }
@@ -105,7 +104,7 @@ public final class ExperimentSQLInjection{
     }
     sqlGrammarFile.delete();
   }
-
+  */
   /**
    * Returns the grammar, in CFG format:<br>
    * S : SigmaStar str SigmaStar;<br>
@@ -136,11 +135,38 @@ public final class ExperimentSQLInjection{
   private static void runHampi(int n, SolverExperimentResultSet<Pair<Boolean, Double>> hampiResults) throws IOException{
     String tinySQLGrammar = tinySQLGrammar();
     String hampiSQLGrammar = CFG2HMP.convertToHampiGrammar(tinySQLGrammar, "");
+    System.out.println("=========================================================================");
     System.out.println("size " + n);
-    List<ArdillaSQLQuery> queryList = queries();
-    System.out.println("unique queries " + new LinkedHashSet<ArdillaSQLQuery>(queryList).size());
+    List<ArdillaSQLQuery> queryList = queries_2();
+    Set<ArdillaSQLQuery> querySet = new LinkedHashSet<ArdillaSQLQuery>(queryList);
+    System.out.println("queries " + queryList.size() + " unique:" + querySet.size());
+    System.out.println(CollectionsExt.toStringInLines(querySet));
 
+    System.out.println("unique query strings " + uniqueQueryStrings(querySet).size());
+    //query string to query
+    Map<String, ArdillaSQLQuery> processed = new LinkedHashMap<String, ArdillaSQLQuery>();
+    //query string to solution
+    Map<String, Pair<Boolean, Double>> results = new LinkedHashMap<String, Pair<Boolean, Double>>();
+
+    Set<String> attackedSinks = new LinkedHashSet<String>();
+    //attacks are counted per query but we don't want to solve the same constraints many times
     for (ArdillaSQLQuery query : queryList){
+      String sinkName = query.app + ":" + query.sink;
+      if (attackedSinks.contains(sinkName)){
+        System.out.println("sink already attacked " + sinkName);
+        continue;//skip - this sink was already attacked
+      }
+      if (processed.containsKey(query.queryString())){
+        Pair<Boolean, Double> res = results.get(query.queryString());
+        System.out.println("already solved " + processed.get(query.queryString()) + " " + res);
+        if (res.first){
+          attackedSinks.add(sinkName);
+        }
+        continue;//skip this query - it was solved before
+      }else{
+        processed.put(query.queryString(), query);
+      }
+
       for (String bad : badSQLStrings()){
         String constraint = createHampiSQLiConstraint(hampiSQLGrammar, n, query, bad);
         //                System.out.println("constraint");
@@ -148,15 +174,34 @@ public final class ExperimentSQLInjection{
         StringBuilder out = new StringBuilder();
         Pair<Boolean, Double> solveConstraint = HampiExperiments.solveConstraint(constraint, out);
         hampiResults.addResult(resultName(query, bad), n, solveConstraint);
-        //if (solveConstraint.first){
+        System.out.println("size " + n + " query " + processed.size() + " of " + querySet.size());
+
         System.out.println("hampi " + solveConstraint);
-          System.out.println(query);
-          System.out.println(bad);
-          System.out.println(out);
-          System.out.println("--------------------------------------");
-        //}
+        System.out.println(query);
+        System.out.println(bad);
+        System.out.println(out);
+        results.put(query.queryString(), solveConstraint);
+        if (solveConstraint.first) {
+          attackedSinks.add(sinkName);
+        }
+        System.out.println("attacked sinks: " + attackedSinks.size());
+        System.out.println("--------------------------------------");
+        if (solveConstraint.first){
+          //skip other bad strings for this query
+          break;
+        }
       }
     }
+    System.out.println("attacks for size " + n + ": " + attackedSinks.size());
+    System.out.println(CollectionsExt.toStringInSortedLines(attackedSinks));
+  }
+
+  private static Set<String> uniqueQueryStrings(Set<ArdillaSQLQuery> querySet){
+    Set<String> result = new LinkedHashSet<String>();
+    for (ArdillaSQLQuery ardillaSQLQuery : querySet){
+      result.add(ardillaSQLQuery.queryString());
+    }
+    return result;
   }
 
   private static String resultName(ArdillaSQLQuery query, String bad){
@@ -177,13 +222,24 @@ public final class ExperimentSQLInjection{
     return b.toString();
   }
 
-  public static List<ArdillaSQLQuery> queries(){
+  //  public static List<ArdillaSQLQuery> queries(){
+  //    List<ArdillaSQLQuery> res = new ArrayList<ArdillaSQLQuery>();
+  //    res.addAll(queriesGeccbblite());
+  //    res.addAll(queriesEVE());
+  //    res.addAll(queriesFAQForge());
+  //    res.addAll(queriesSchoolmate());
+  //    res.addAll(queriesWebchess());
+  //    return res;
+  //  }
+
+  //this lits contains only queries that Ardilla was able to attack (see ardilla's webpage)
+  public static List<ArdillaSQLQuery> queries_2(){
     List<ArdillaSQLQuery> res = new ArrayList<ArdillaSQLQuery>();
-    res.addAll(queriesGeccbblite());
-    res.addAll(queriesEVE());
-    res.addAll(queriesFAQForge());
-    res.addAll(queriesSchoolmate());
-    res.addAll(queriesWebchess());
+    res.addAll(queriesGeccbblite_2());
+    res.addAll(queriesEVE_2());
+    res.addAll(queriesFAQForge_2());
+    res.addAll(queriesSchoolmate_2());
+    res.addAll(queriesWebchess_2());
     return res;
   }
 
@@ -269,10 +325,10 @@ public final class ExperimentSQLInjection{
    */
   public static List<String> badSQLStrings(){
     List<String> res = new ArrayList<String>();
-    res.add("OnQn");
-    res.add("OiQi");
-    res.add("OTnTQTnT");
-    res.add("OTiTQTiT");
+    res.add("OnQn");//OR num = num
+    res.add("OiQi");//OR id = id
+    res.add("OTnTQTnT");//OR 'num' = 'num'
+    res.add("OTiTQTiT");//OR 'id' = 'id'
     return res;
   }
 
@@ -324,7 +380,19 @@ public final class ExperimentSQLInjection{
   private static List<ArdillaSQLQuery> queriesFAQForge(){
     String v = ArdillaSQLQuery.VAR;
     List<ArdillaSQLQuery> res = new ArrayList<ArdillaSQLQuery>();
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("faq", "sink1",//
+        //        new String[] { "SELECT * FROM Faq WHERE context = '", v, "'" },//
+        //        new String[] { "SELECT * FROM Faq WHERE context = '", "n", "'" }//
+        new String[] { "SRFiWiQT", v, "T" },//
+        new String[] { "SRFiWiQT", "n", "T" }//
+        ));
+    return res;
+  }
+
+  private static List<ArdillaSQLQuery> queriesFAQForge_2(){//only those reported as attacks
+    String v = ArdillaSQLQuery.VAR;
+    List<ArdillaSQLQuery> res = new ArrayList<ArdillaSQLQuery>();
+    res.addAll(ArdillaSQLQuery.create("faq", "sink1",//
         //        new String[] { "SELECT * FROM Faq WHERE context = '", v, "'" },//
         //        new String[] { "SELECT * FROM Faq WHERE context = '", "n", "'" }//
         new String[] { "SRFiWiQT", v, "T" },//
@@ -336,21 +404,61 @@ public final class ExperimentSQLInjection{
   private static List<ArdillaSQLQuery> queriesSchoolmate(){
     String v = ArdillaSQLQuery.VAR;
     List<ArdillaSQLQuery> res = new ArrayList<ArdillaSQLQuery>();
-        res.addAll(ArdillaSQLQuery.create(//
+        res.addAll(ArdillaSQLQuery.create("schoolmate", "sink1",//
         //          new String[] { "select password from users where username = \"", v, "\"" },//
         //        new String[] { "select password from users where username = \"", "n", "\"" }//
         new String[] { "SiFiWiQT", v, "T" },//
         new String[] { "SiFiWiQT", "n", "T" }//
         ));
-        res.addAll(ArdillaSQLQuery.create(//
+        res.addAll(ArdillaSQLQuery.create("schoolmate", "sink2",//
             new String[] { "SiCiCiCiCiFiWiQ", v },//
             new String[] { "SiCiCiCiCiFiWiQ", "n" }//
         ));
-        res.addAll(ArdillaSQLQuery.create(//
+        res.addAll(ArdillaSQLQuery.create("schoolmate", "sink3",//
         new String[] { "UiEiQTTCiQTTCiQTTCiQTTCiQTTWiQT", v, "T" },//
         new String[] { "UiEiQTTCiQTTCiQTTCiQTTCiQTTWiQT", "n", "T" }//
         ));
-        res.addAll(ArdillaSQLQuery.create(//
+        res.addAll(ArdillaSQLQuery.create("schoolmate", "sink4",//
+        new String[] { "UiEiQT", v, "TCiQT", v, "TCiQT", v, "TCiQT", v, "TCiQT", v, "TWiQT", v, "T" },//
+        new String[] { "UiEiQT", "n", "TCiQT", "n", "TCiQT", "n", "TCiQT", "n", "TCiQT", "n", "TWiQT", "n", "T" }//
+        ));
+
+    return res;
+  }
+
+  private static List<ArdillaSQLQuery> queriesSchoolmate_2(){//only those reported as attacks
+    String v = ArdillaSQLQuery.VAR;
+    List<ArdillaSQLQuery> res = new ArrayList<ArdillaSQLQuery>();
+    res.addAll(ArdillaSQLQuery.create("schoolmate", "sink1",//
+        //          new String[] { "select password from users where username = \"", v, "\"" },//
+        //        new String[] { "select password from users where username = \"", "n", "\"" }//
+        new String[] { "SiFiWiQT", v, "T" },//
+        new String[] { "SiFiWiQT", "n", "T" }//
+        ));
+    //this query has 2 occurences
+    //SELECT aperc, bperc, cperc, dperc, coursename FROM courses WHERE courseid = 1
+    res.addAll(ArdillaSQLQuery.create("schoolmate", "sink2",//
+        new String[] { "SiCiCiCiCiFiWiQ", v },//
+        new String[] { "SiCiCiCiCiFiWiQ", "n" }//
+        ));
+    //SELECT aperc, bperc, cperc, dperc, coursename FROM courses WHERE courseid = 1
+    res.addAll(ArdillaSQLQuery.create("schoolmate", "sink3",//
+        new String[] { "SiCiCiCiCiFiWiQ", v },//
+        new String[] { "SiCiCiCiCiFiWiQ", "n" }//
+        ));
+    //this query has 2 occurences
+    //UPDATE courses SET aperc = '', bperc = '', cperc = '', dperc = '', fperc = '' WHERE courseid = '1'
+    res.addAll(ArdillaSQLQuery.create("schoolmate", "sink4",//
+        new String[] { "UiEiQTTCiQTTCiQTTCiQTTCiQTTWiQT", v, "T" },//
+        new String[] { "UiEiQTTCiQTTCiQTTCiQTTCiQTTWiQT", "n", "T" }//
+        ));
+    //UPDATE courses SET aperc = '', bperc = '', cperc = '', dperc = '', fperc = '' WHERE courseid = '1'
+    res.addAll(ArdillaSQLQuery.create("schoolmate", "sink5",//
+        new String[] { "UiEiQTTCiQTTCiQTTCiQTTCiQTTWiQT", v, "T" },//
+        new String[] { "UiEiQTTCiQTTCiQTTCiQTTCiQTTWiQT", "n", "T" }//
+        ));
+    //UPDATE schoolinfo SET schoolname = "1", address = '1', phonenumber = '1', sitetext = '1', sitemessage = '1', numsemesters = '1', numperiods = '1', apoint = '1', bpoint = '1', cpoint = '1', dpoint = '1', fpoint = '1' where schoolname = 'MIT' LIMIT 1
+    res.addAll(ArdillaSQLQuery.create("schoolmate", "sink6",//
         new String[] { "UiEiQT", v, "TCiQT", v, "TCiQT", v, "TCiQT", v, "TCiQT", v, "TWiQT", v, "T" },//
         new String[] { "UiEiQT", "n", "TCiQT", "n", "TCiQT", "n", "TCiQT", "n", "TCiQT", "n", "TWiQT", "n", "T" }//
         ));
@@ -361,111 +469,111 @@ public final class ExperimentSQLInjection{
   private static List<ArdillaSQLQuery> queriesWebchess(){
     String v = ArdillaSQLQuery.VAR;
     List<ArdillaSQLQuery> res = new ArrayList<ArdillaSQLQuery>();
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink1",//
         //        new String[] { "SELECT playerID FROM players WHERE nick = '", v, "'" },//
         //        new String[] { "SELECT playerID FROM players WHERE nick = '", "n", "'" }//
         new String[] { "SiFiWiQT", v, "T" },//
         new String[] { "SiFiWiQT", "n", "T" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink2",//
         //        new String[] { "SELECT * FROM players WHERE nick = '" ,v, "' AND password = ''" },//
         //        new String[] { "SELECT * FROM players WHERE nick = '", "n", "' AND password = ''" }//
         new String[] { "SRFiWiQT", v, "TAiQTT" },//
         new String[] { "SRFiWiQT", "n", "TAiQTT" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink3",//
         //        new String[] { "UPDATE games SET gameMessage = 'inviteDeclined', messageFrom = '", v, "' WHERE gameID =", v },//
         //        new String[] { "UPDATE games SET gameMessage = 'inviteDeclined', messageFrom = '", "n", "' WHERE gameID =", "n" }//
         new String[] { "UiEiQTiTCiQT", v, "TWiQ", v },//
         new String[] { "UiEiQTiTCiQT", "n", "TWiQ", "n" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink4",//
         //        new String[] { "UPDATE games SET gameMessage = '', messageFrom = '' WHERE gameID =", v },//
         //        new String[] { "UPDATE games SET gameMessage = '', messageFrom = '' WHERE gameID =", "n" }//
         new String[] { "UiEiQTTCiQTTWiQ", v },//
         new String[] { "UiEiQTTCiQTTWiQ", "n" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink5",//
         //        new String[] { "DELETE FROM history WHERE gameID =", v },//
         //        new String[] { "DELETE FROM history WHERE gameID =", "n" }//
         new String[] { "DFiWiQ", v },//
         new String[] { "DFiWiQ", "n" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink6",//
         //        new String[] { "UPDATE games SET lastMove = NOW() WHERE gameID =" ,v },//
         //        new String[] { "UPDATE games SET lastMove = NOW() WHERE gameID =", "n" }//
         new String[] { "UiEiQnWiQ", v },//
         new String[] { "UiEiQnWiQ", "n" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink7",//
         //        new String[] { "UPDATE preferences SET value = '", v, "' WHERE playerID = -1 AND preference = 'theme'" },//
         //        new String[] { "UPDATE preferences SET value = '", "n", "' WHERE playerID = -1 AND preference = 'theme'" }//
         new String[] { "UiEiQT", v, "TWiQnAiQTiT" },//
         new String[] { "UiEiQT", "n", "TWiQnAiQTiT" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink8",//
         //        new String[] { "UPDATE preferences SET value = '", v, "' WHERE playerID = -1 AND preference = 'history'" },//
         //        new String[] { "UPDATE preferences SET value = '", "n", "' WHERE playerID = -1 AND preference = 'history'" }//
         new String[] { "UiEiQT", v, "TWiQnAiQTiT" },//
         new String[] { "UiEiQT", "n", "TWiQnAiQTiT" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink9",//
         //        new String[] { "UPDATE preferences SET value = '", v, "' WHERE playerID = -1 AND preference = 'emailnotification'" },//
         //        new String[] { "UPDATE preferences SET value = '", "n", "' WHERE playerID = -1 AND preference = 'emailnotification'" }//
         new String[] { "UiEiQT", v, "TWiQnAiQTiT" },//
         new String[] { "UiEiQT", "n", "TWiQnAiQTiT" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink10",//
         //        new String[] { "SELECT nick FROM players, games WHERE playerID = whitePlayer AND gameID =", v },//
         //        new String[] { "SELECT nick FROM players, games WHERE playerID = whitePlayer AND gameID =", "n" }//
         new String[] { "SiFiCiWiQiAiQ", v },//
         new String[] { "SiFiCiWiQiAiQ", "n" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink11",//
         //        new String[] { "SELECT nick FROM players, games WHERE playerID = blackPlayer AND gameID =", v },//
         //        new String[] { "SELECT nick FROM players, games WHERE playerID = blackPlayer AND gameID =", "n" }//
         new String[] { "SiFiCiWiQiAiQ", v },//
         new String[] { "SiFiCiWiQiAiQ", "n" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink12",//
         //        new String[] { "SELECT * FROM history WHERE gameID =", v, " ORDER BY timeOfMove" },//
         //        new String[] { "SELECT * FROM history WHERE gameID =", "n", " ORDER BY timeOfMove" }//
         new String[] { "SRFiWiQ", v, "XBi" },//
         new String[] { "SRFiWiQ", "n", "XBi" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink13",//
         //        new String[] { "SELECT * FROM pieces WHERE gameID =", v },//
         //        new String[] { "SELECT * FROM pieces WHERE gameID =", "n" }//
         new String[] { "SRFiWiQ", v },//
         new String[] { "SRFiWiQ", "n" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink14",//
         //        new String[] { "SELECT whitePlayer, blackPlayer FROM games WHERE gameID =" . VAR(gameID)},//
         //        new String[] { "SELECT whitePlayer, blackPlayer FROM games WHERE gameID =" . VAR(gameID)},//
         new String[] { "SiCiFiWiQ", v },//
         new String[] { "SiCiFiWiQ", v }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink15",//
         //        new String[] { "SELECT * FROM messages WHERE gameID =" . VAR(gameID) . " AND destination = 'black'"},//
         new String[] { "SRFiWiQ", v, "AiQTiT" },//
         new String[] { "SRFiWiQ", v, "AiQTiT" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink16",//
         //        new String[] { "SELECT * FROM messages WHERE gameID =" . VAR(gameID) . " AND msgStatus = 'request' AND destination = 'white'"},//
         new String[] { "SRFiWiQ", v, "AiQTiTAiQTiT" },//
         new String[] { "SRFiWiQ", "n", "AiQTiTAiQTiT" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink17",//
         //        new String[] { "SELECT gameMessage, messageFrom FROM games WHERE gameID =" . VAR(gameID)},//
         new String[] { "SiCiFiWiQ", v },//
         new String[] { "SiCiFiWiQ", "n" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink18",//
         //        new String[] { "SELECT gameMessage, messageFrom FROM games WHERE gameID =" . VAR(gameID)},//
         new String[] { "SiCiFiWiQ", v },//
         new String[] { "SiCiFiWiQ", "n" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink19",//
         //        new String[] { "SELECT password FROM players WHERE playerID =" . VAR(opponentsID)},//
         new String[] { "SiFiWiQ", v },//
         new String[] { "SiFiWiQ", "n" }//
@@ -473,25 +581,25 @@ public final class ExperimentSQLInjection{
 
     //TODO:"select curPiece,curColor,replaced from history where replaced > '' and gameID = '" . VAR(gameID) . "' order by curColor desc , replaced desc"
 
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink20",//
         //        new String[] { "UPDATE history SET promotedTo = 'pawn', isInCheck = 1 WHERE gameID =", v, " AND timeOfMove = ''" },//
         //        new String[] { "UPDATE history SET promotedTo = 'pawn', isInCheck = 1 WHERE gameID =", "n", " AND timeOfMove = ''" }//
         new String[] { "UiEiQTiTCiQnWiQ", v, "AiQTT" },//
         new String[] { "UiEiQTiTCiQnWiQ", "n", "AiQTT" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink21",//
         //        new String[] {"UPDATE games SET gameMessage = 'checkMate', messageFrom = 'white' WHERE gameID =" ,v },//
         //        new String[] { "UPDATE games SET gameMessage = 'checkMate', messageFrom = 'white' WHERE gameID =", "n" }//
         new String[] { "UiEiQTiTCiQTiTWiQ", v },//
         new String[] { "UiEiQTiTCiQTiTWiQ", "n" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink22",//
         //        new String[] { "UPDATE messages SET msgStatus = 'denied', destination = 'white' WHERE gameID =", v, " AND msgType = 'undo' AND msgStatus = 'request' AND destination = 'black'" },//
         //        new String[] { "UPDATE messages SET msgStatus = 'denied', destination = 'white' WHERE gameID =", "n", " AND msgType = 'undo' AND msgStatus = 'request' AND destination = 'black'" }//
         new String[] { "UiEiQTiTCiQTiTWiQ", v, "AiQTiTAiQTiTAiQTiT" },//
         new String[] { "UiEiQTiTCiQTiTWiQ", "n", "AiQTiTAiQTiTAiQTiT" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink23",//
         //        new String[] { "UPDATE messages SET msgStatus = 'denied', destination = 'white' WHERE gameID =" ,v, " AND msgType = 'draw' AND msgStatus = 'request' AND destination = 'black'" },//
         //        new String[] { "UPDATE messages SET msgStatus = 'denied', destination = 'white' WHERE gameID =", "n", " AND msgType = 'draw' AND msgStatus = 'request' AND destination = 'black'" }//
         new String[] { "UiEiQTiTCiQTiTWiQ", v, "AiQTiTAiQTiTAiQTiT" },//
@@ -503,13 +611,13 @@ public final class ExperimentSQLInjection{
   private static List<ArdillaSQLQuery> queriesEVE(){
     String v = ArdillaSQLQuery.VAR;
     List<ArdillaSQLQuery> res = new ArrayList<ArdillaSQLQuery>();
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("eve", "sink1",//
         //        new String[] { "UPDATE config SET welcome = '", v, "'" },//
         //        new String[] { "UPDATE config SET welcome = '1'" }//
         new String[] { "UiEiQT", v, "T" },//
         new String[] { "UiEiQT", "n", "T" }//
         ));
-        res.addAll(ArdillaSQLQuery.create(//
+        res.addAll(ArdillaSQLQuery.create("eve", "sink2",//
         //        new String[] { "UPDATE MembersMain SET Name = '", v, "', Division = '", v, "', RankCorp = '", v, "', Vacation = '", v, "', Comment = '", v, "', LastUpdate = n, Deleted = '", v,
         //            "' WHERE MemberID = '", v, "'" },//
         //        new String[] { "UPDATE MembersMain SET Name = '", "n", "', Division = '", "n", "', RankCorp = '", "n", "', Vacation = '", "n", "', Comment = '", "n", "', LastUpdate = n, Deleted = '", "n",
@@ -517,60 +625,60 @@ public final class ExperimentSQLInjection{
                 new String[] { "UiEiQT", v, "TCiQT", v, "TCiQT", v, "TCiQT", v, "TCiQT", v, "TCiQiCiQT", v, "TWiQT", v, "T" },//
                 new String[] { "UiEiQT", "n", "TCiQT", "n", "TCiQT", "n", "TCiQT", "n", "TCiQT", "n", "TCiQiCiQT", "n", "TWiQT", "n", "T" }//
             ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("eve", "sink3",//
         new String[] { "UiEiQT", v, "TCiQT", v, "TCiQT", v, "TCiQT", v, "TCiQT", v, "TCiQT", v, "TWiQT", v, "T" },//
         new String[] { "UiEiQT", "n", "TCiQT", "n", "TCiQT", "n", "TCiQT", "n", "TCiQT", "n", "TCiQT", "n", "TWiQT", "n", "T" }//
        ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("eve", "sink4",//
         //        new String[] { "SELECT MemberID, Name, Division, DateJoined, RankCorp, Vacation, Comment, Deleted FROM MembersMain WHERE MemberID='", v, "'" },//
         //        new String[] { "SELECT MemberID, Name, Division, DateJoined, RankCorp, Vacation, Comment, Deleted FROM MembersMain WHERE MemberID='", "n", "'" }//
         new String[] { "SiCiCiCiCiCiCiCiFiWiQT", v, "T" },//
         new String[] { "SiCiCiCiCiCiCiCiFiWiQT", "n", "T" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("eve", "sink5",//
         //        new String[] { "UPDATE MembersMain SET Vacation = '", v, "' WHERE Name = '", v, "'" },//
         //        new String[] { "UPDATE MembersMain SET Vacation = '", "n", "' WHERE Name = '", "n", "'" }//
         new String[] { "UiEiQT", v, "TWiQT", v, "T" },//
         new String[] { "UiEiQT", "n", "TWiQT", "n", "T" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("eve", "sink6",//
         //        new String[] { "SELECT MemberID, Name, Division, RankCorp, Vacation FROM MembersMain WHERE Name = '", v, "'" },//
         //        new String[] { "SELECT MemberID, Name, Division, RankCorp, Vacation FROM MembersMain WHERE Name = '", "n", "'" }//
         new String[] { "SiCiCiCiCiFiWiQT", v, "T" },//
         new String[] { "SiCiCiCiCiFiWiQT", "n", "T" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("eve", "sink7",//
         //        new String[] { "UPDATE MembersMain SET LastUpdate = Now() WHERE Name = '", v, "'" },//
         //        new String[] { "UPDATE MembersMain SET LastUpdate = Now() WHERE Name = '", "n", "'" }//
         new String[] { "UiEiQnWiQT", v, "T" },//
         new String[] { "UiEiQnWiQT", "n", "T" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("eve", "sink8",//
         new String[] { "UiEiQT", v, "TCiQT", v, "TCiQT", v, "TCiQTnTCiQT", v, "TCiQnCiQT", v, "TWiQT", v, "T" },//
         new String[] { "UiEiQT", "n", "TCiQT", "n", "TCiQT", "n", "TCiQTnTCiQT", "n", "TCiQnCiQT", "n", "TWiQT", "n", "T" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("eve", "sink9",//
         //        new String[] { "UPDATE MembersMain SET Name = '", v, "', Division = '", v, "', RankCorp = '", v, "', Vacation = '0', Comment = '", v, "', Deleted = '", v, "' WHERE MemberID = '", v, "'" },//
         //        new String[] { "UPDATE MembersMain SET Name = '", "n", "', Division = '", "n", "', RankCorp = '", "n", "', Vacation = '0', Comment = '", "n", "', Deleted = '", "n", "' WHERE MemberID = '",
         //            "n", "'" }//
         new String[] { "UiEiQT", v, "TCiQT", v, "TCiQT", v, "TCiQTnTCiQT", v, "TCiQT", v, "TWiQT", v, "T" },//
         new String[] { "UiEiQT", "n", "TCiQT", "n", "TCiQT", "n", "TCiQTnTCiQT", "n", "TCiQT", "n", "TWiQT", "n", "T" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("eve", "sink10",//
         //        new String[] {"UPDATE MembersMain SET Name = '" ,v, "', Division = '" ,v, "', RankCorp = '" ,v, "', Vacation = '" ,v, "', Comment = '" ,v, "', LastUpdate = Now(), Deleted = '0' WHERE MemberID = '" ,v, "'"},//
         //        new String[] { "UPDATE MembersMain SET Name = '", "n", "', Division = '", "n", "', RankCorp = '", "n", "', Vacation = '", "n", "', Comment = '", "n",
         //            "', LastUpdate = Now(), Deleted = '0' WHERE MemberID = '", "n", "'" }//
         new String[] { "UiEiQT", v, "TCiQT", v, "TCiQT", v, "TCiQT", v, "TCiQT", v, "TCiQnCiQTnTWiQT", v, "T" },//
         new String[] { "UiEiQT", "n", "TCiQT", "n", "TCiQT", "n", "TCiQT", "n", "TCiQT", "n", "TCiQnCiQTnTWiQT", "n", "T" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("eve", "sink11",//
         //        new String[] {"UPDATE MembersMain SET Name = '" ,v, "', Division = '" ,v, "', RankCorp = '" ,v, "', Vacation = '" ,v, "', Comment = '" ,v, "', Deleted = '0' WHERE MemberID = '" ,v, "'"},//
         //        new String[] { "UPDATE MembersMain SET Name = '", "n", "', Division = '", "n", "', RankCorp = '", "n", "', Vacation = '", "n", "', Comment = '", "n", "', Deleted = '0' WHERE MemberID = '",
         //            "n", "'" }//
         new String[] { "UiEiQT", v, "TCiQT", v, "TCiQT", v, "TCiQT", v, "TCiQT", v, "TCiQTnTWiQT", v, "T" },//
         new String[] { "UiEiQT", "n", "TCiQT", "n", "TCiQT", "n", "TCiQT", "n", "TCiQT", "n", "TCiQTnTWiQT", "n", "T" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("eve", "sink12",//
         //        new String[] { "UPDATE MembersMain SET Name = '", v, "', Division = '", v, "', RankCorp = '", v, "', Vacation = '0', Comment = '", v,
         //            "', LastUpdate = Now(), Deleted = '0' WHERE MemberID = '", v, "'" },//
         //            new String[] { "UPDATE MembersMain SET Name = '", "n", "', Division = '", "n", "', RankCorp = '", "n", "', Vacation = '0', Comment = '", "n",
@@ -578,7 +686,7 @@ public final class ExperimentSQLInjection{
         new String[] { "UiEiQT", v, "TCiQT", v, "TCiQT", v, "TCiQTnTCiQT", v, "TCiQnCiQTnTWiQT", v, "T" },//
         new String[] { "UiEiQT", "n", "TCiQT", "n", "TCiQT", "n", "TCiQTnTCiQT", "n", "TCiQnCiQTnTWiQT", "n", "T" }//
         ));
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("eve", "sink13",//
         //        new String[] { "UPDATE MembersMain SET Name = '", v, "', Division = '", v, "', RankCorp = '", v, "', Vacation = '0', Comment = '", v, "', Deleted = '0' WHERE MemberID = '", v, "'" },//
         //        new String[] { "UPDATE MembersMain SET Name = '", "n", "', Division = '", "n", "', RankCorp = '", "n", "', Vacation = '0', Comment = '", "n", "', Deleted = '0' WHERE MemberID = '", "n", "'" }//
         new String[] { "UiEiQT", v, "TCiQT", v, "TCiQT", v, "TCiQTnTCiQT", v, "TCiQTnTWiQT", v, "T" },//
@@ -588,11 +696,30 @@ public final class ExperimentSQLInjection{
     return res;
   }
 
+  private static List<ArdillaSQLQuery> queriesEVE_2(){//only those reported as attacks
+    String v = ArdillaSQLQuery.VAR;
+    List<ArdillaSQLQuery> res = new ArrayList<ArdillaSQLQuery>();
+    res.addAll(ArdillaSQLQuery.create("eve", "sink1",//
+        //        new String[] { "SELECT MemberID, Name, Division, DateJoined, RankCorp, Vacation, Comment, Deleted FROM MembersMain WHERE MemberID='", v, "'" },//
+        //        new String[] { "SELECT MemberID, Name, Division, DateJoined, RankCorp, Vacation, Comment, Deleted FROM MembersMain WHERE MemberID='", "n", "'" }//
+        new String[] { "SiCiCiCiCiCiCiCiFiWiQT", v, "T" },//
+        new String[] { "SiCiCiCiCiCiCiCiFiWiQT", "n", "T" }//
+        ));
+    res.addAll(ArdillaSQLQuery.create("eve", "sink2",//
+        //        new String[] { "UPDATE MembersMain SET Vacation = '", v, "' WHERE Name = '", v, "'" },//
+        //        new String[] { "UPDATE MembersMain SET Vacation = '", "n", "' WHERE Name = '", "n", "'" }//
+        new String[] { "UiEiQT", v, "TWiQT", v, "T" },//
+        new String[] { "UiEiQT", "n", "TWiQT", "n", "T" }//
+        ));
+
+    return res;
+  }
+
   //this is for testing comments
   private static List<ArdillaSQLQuery> queriesFake(){
     String v = ArdillaSQLQuery.VAR;
     List<ArdillaSQLQuery> res = new ArrayList<ArdillaSQLQuery>();
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("fake", "sinkFake",//
         //        new String[] { "SELECT * FROM messages WHERE gameID =" . VAR(gameID) . " AND msgStatus = 'request' AND destination = 'white'"},//
         new String[] { "SRF", v, "WiQnAiQTiTAiQTiT" },//
         new String[] { "SRF", "i", "WiQnAiQTiTAiQTiT" }//
@@ -609,21 +736,21 @@ public final class ExperimentSQLInjection{
     //    res.addAll(ArdillaSQLQuery.create(//
     //        new String[] { "SELECT * FROM geccBB_forum WHERE id=", v },//
     //        new String[] { "SELECT * FROM geccBB_forum WHERE id=", "1" }));//
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("geccbblite", "sink1",//
         new String[] { "SRFiWiQ", v },//
         new String[] { "SRFiWiQ", "n" }));//
     //    res.addAll(ArdillaSQLQuery.create(//
     //        new String[] { "SELECT id,rispostadel FROM geccBB_forum WHERE id=", v },//
     //        new String[] { "SELECT id,rispostadel FROM geccBB_forum WHERE id=", "1" }));//
-    res.addAll(ArdillaSQLQuery.create(//
+    res.addAll(ArdillaSQLQuery.create("geccbblite", "sink2",//
         new String[] { "SiCiFiWiQ", v },//
         new String[] { "SiCiFiWiQ", "n" }));//
-    //    res.addAll(ArdillaSQLQuery.create(//
-    //        new String[] { "SELECT * FROM geccBB_forum WHERE id=", v }, //
-    //        new String[] { "SELECT * FROM geccBB_forum WHERE id=", "1" }));
-    res.addAll(ArdillaSQLQuery.create(//
-        new String[] { "SRFiWiQ", v }, //
-        new String[] { "SRFiWiQ", "n" }));
+    //    res.addAll(ArdillaSQLQuery.create(// //duplicated constraint
+        //        new String[] { "SELECT * FROM geccBB_forum WHERE id=", v }, //
+        //        new String[] { "SELECT * FROM geccBB_forum WHERE id=", "1" }));
+        res.addAll(ArdillaSQLQuery.create("geccbblite", "sink3",//
+            new String[] { "SRFiWiQ", v }, //
+            new String[] { "SRFiWiQ", "n" }));
     //    //    res.addAll(ArdillaSQLQuery.create(//
     //    //        new String[] { "INSERT INTO geccBB_forum VALUES(NULL, '", v, "', '1221844226', '", v, "', '", v, "", v, "', '", v, "')" },//
     //    //        new String[] { "INSERT INTO geccBB_forum VALUES(NULL, '", "1", "', '1221844226', '", "1", "', '", "1", "", "1", "', '", "1", "')" }));
@@ -639,6 +766,25 @@ public final class ExperimentSQLInjection{
     return res;
   }
 
+  //returns the queries from the geccbblite program
+  private static List<ArdillaSQLQuery> queriesGeccbblite_2(){//only those reported as attacks
+    String v = ArdillaSQLQuery.VAR;
+    List<ArdillaSQLQuery> res = new ArrayList<ArdillaSQLQuery>();
+    //    res.addAll(ArdillaSQLQuery.create(//
+    //        new String[] { "SELECT * FROM geccBB_forum WHERE id=", v },//
+    //        new String[] { "SELECT * FROM geccBB_forum WHERE id=", "1" }));//
+    res.addAll(ArdillaSQLQuery.create("geccbblite", "sink1",//
+        new String[] { "SRFiWiQ", v },//
+        new String[] { "SRFiWiQ", "n" }));//
+    //    res.addAll(ArdillaSQLQuery.create(//
+    //        new String[] { "SELECT id,rispostadel FROM geccBB_forum WHERE id=", v },//
+    //        new String[] { "SELECT id,rispostadel FROM geccBB_forum WHERE id=", "1" }));//
+    res.addAll(ArdillaSQLQuery.create("geccbblite", "sink2",//
+        new String[] { "SiCiFiWiQ", v },//
+        new String[] { "SiCiFiWiQ", "n" }));//
+    return res;
+  }
+
 
   /**
    * A query is a sequence: "s1 v s2" where s1 and s2 are constant strings and v
@@ -646,8 +792,10 @@ public final class ExperimentSQLInjection{
    */
   public static final class ArdillaSQLQuery{
     public static final String VAR = "VAR"; //variable marker
-    private final String s1;
-    private final String s2;
+    public final String s1;
+    public final String s2;
+    public final String app; //name of the app
+    public final String sink; //name of the sensitive sink (eg. line number and file)
 
     public static final Comparator<ArdillaSQLQuery> SIZE_ORDER = new Comparator<ArdillaSQLQuery>(){
       @Override
@@ -655,13 +803,17 @@ public final class ExperimentSQLInjection{
         int sizeDiff = o1.size(0) - o2.size(0);
         if (sizeDiff != 0)
           return sizeDiff;
-        return o1.asVal("v").compareTo(o2.asVal("v"));
+        return o1.app.compareTo(o2.app);//sort alphabetically by app if same size
       }
     };
 
-    public ArdillaSQLQuery(String s1, String s2){
+    public ArdillaSQLQuery(String app, String sink, String s1, String s2){
       assert s1 != null;
       assert s2 != null;
+      assert app != null;
+      assert sink != null;
+      this.app = app;
+      this.sink = sink;
       this.s1 = s1;
       this.s2 = s2;
     }
@@ -702,7 +854,7 @@ public final class ExperimentSQLInjection{
      * Creates a set of queries, one for each occurrence of the variable marker.
      * The other occurrences will be replaced with concrete values.
      */
-    public static Set<ArdillaSQLQuery> create(String[] symbolicStrings, String[] concreteStrings){
+    public static Set<ArdillaSQLQuery> create(String app, String sink, String[] symbolicStrings, String[] concreteStrings){
       assert symbolicStrings.length == concreteStrings.length : symbolicStrings.length + " " + concreteStrings.length;
       Set<ArdillaSQLQuery> res = new LinkedHashSet<ArdillaSQLQuery>();
       for (int i = 0; i < symbolicStrings.length; i++){
@@ -711,7 +863,7 @@ public final class ExperimentSQLInjection{
         }
         String s1 = concretes(concreteStrings, 0, i);
         String s2 = concretes(concreteStrings, i + 1, symbolicStrings.length - i - 1);
-        res.add(new ArdillaSQLQuery(s1, s2));
+        res.add(new ArdillaSQLQuery(app, sink, s1, s2));
       }
       assert !res.isEmpty() : "no variable marker in " + Arrays.toString(symbolicStrings);
       return res;
@@ -727,17 +879,97 @@ public final class ExperimentSQLInjection{
       if (!(obj instanceof ArdillaSQLQuery))
         return false;
       ArdillaSQLQuery that = (ArdillaSQLQuery) obj;
-      return this.s1.equals(that.s1) && this.s2.equals(that.s2);
+      return this.app.equals(that.app) && this.sink.equals(that.sink) && this.s1.equals(that.s1) && this.s2.equals(that.s2);
     }
 
     @Override
     public int hashCode(){
-      return s1.hashCode() * s2.hashCode();
+      return app.hashCode() * 3 + sink.hashCode() * 7 + s1.hashCode() * 11 + s2.hashCode() * 13;
     }
 
     @Override
     public String toString(){
-      return s1 + " . var . " + s2;
+      return app + ":" + sink + " " + s1 + " . var . " + s2;
     }
+
+    public String queryString(){
+      return (s1.isEmpty() ? "" : s1 + " . ") + "var" + (s2.isEmpty() ? "" : " . " + s2);
+    }
+  }
+
+
+  private static List<ArdillaSQLQuery> queriesWebchess_2(){//only those reported as attacks
+    String v = ArdillaSQLQuery.VAR;
+    List<ArdillaSQLQuery> res = new ArrayList<ArdillaSQLQuery>();
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink1",//OK
+        //        new String[] { "SELECT playerID FROM players WHERE nick = '", v, "'" },//
+        //        new String[] { "SELECT playerID FROM players WHERE nick = '", "n", "'" }//
+        new String[] { "SiFiWiQT", v, "T" },//
+        new String[] { "SiFiWiQT", "n", "T" }//
+        ));
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink2",//OK
+        //        new String[] { "SELECT * FROM players WHERE nick = '" ,v, "' AND password = ''" },//
+        //        new String[] { "SELECT * FROM players WHERE nick = '", "n", "' AND password = ''" }//
+        new String[] { "SRFiWiQT", v, "TAiQTT" },//
+        new String[] { "SRFiWiQT", "n", "TAiQTT" }//
+        ));
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink3",//OK
+        //        new String[] { "SELECT nick FROM players, games WHERE playerID = whitePlayer AND gameID =", v },//
+        //        new String[] { "SELECT nick FROM players, games WHERE playerID = whitePlayer AND gameID =", "n" }//
+        new String[] { "SiFiCiWiQiAiQ", v },//
+        new String[] { "SiFiCiWiQiAiQ", "n" }//
+        ));
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink4",//OK
+        //        new String[] { "SELECT nick FROM players, games WHERE playerID = blackPlayer AND gameID =", v },//
+        //        new String[] { "SELECT nick FROM players, games WHERE playerID = blackPlayer AND gameID =", "n" }//
+        new String[] { "SiFiCiWiQiAiQ", v },//
+        new String[] { "SiFiCiWiQiAiQ", "n" }//
+        ));
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink5",//OK
+        //        new String[] { "SELECT * FROM history WHERE gameID =", v, " ORDER BY timeOfMove" },//
+        //        new String[] { "SELECT * FROM history WHERE gameID =", "n", " ORDER BY timeOfMove" }//
+        new String[] { "SRFiWiQ", v, "XBi" },//
+        new String[] { "SRFiWiQ", "n", "XBi" }//
+        ));
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink6",//OK
+        //        new String[] { "SELECT * FROM pieces WHERE gameID =", v },//
+        //        new String[] { "SELECT * FROM pieces WHERE gameID =", "n" }//
+        new String[] { "SRFiWiQ", v },//
+        new String[] { "SRFiWiQ", "n" }//
+        ));
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink7",//OK
+        //        new String[] { "SELECT whitePlayer, blackPlayer FROM games WHERE gameID =" . VAR(gameID)},//
+        //        new String[] { "SELECT whitePlayer, blackPlayer FROM games WHERE gameID =" . VAR(gameID)},//
+        new String[] { "SiCiFiWiQ", v },//
+        new String[] { "SiCiFiWiQ", v }//
+        ));
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink8",//OK
+        //        new String[] { "SELECT * FROM messages WHERE gameID =" . VAR(gameID) . " AND destination = 'black'"},//
+        new String[] { "SRFiWiQ", v, "AiQTiT" },//
+        new String[] { "SRFiWiQ", v, "AiQTiT" }//
+        ));
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink9",//OK
+        //        new String[] { "SELECT * FROM messages WHERE gameID =" . VAR(gameID) . " AND msgStatus = 'request' AND destination = 'white'"},//
+        new String[] { "SRFiWiQ", v, "AiQTiTAiQTiT" },//
+        new String[] { "SRFiWiQ", "n", "AiQTiTAiQTiT" }//
+        ));
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink10",//OK
+        //        new String[] { "SELECT gameMessage, messageFrom FROM games WHERE gameID =" . VAR(gameID)},//
+        new String[] { "SiCiFiWiQ", v },//
+        new String[] { "SiCiFiWiQ", "n" }//
+        ));
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink11",//OK (same query twice)
+        //        new String[] { "SELECT whitePlayer, blackPlayer FROM games WHERE gameID =" . VAR(gameID)},//
+        //        new String[] { "SELECT whitePlayer, blackPlayer FROM games WHERE gameID =" . VAR(gameID)},//
+        new String[] { "SiCiFiWiQ", v },//
+        new String[] { "SiCiFiWiQ", v }//
+        ));
+    res.addAll(ArdillaSQLQuery.create("webchess", "sink12",//OK
+        //        new String[] { "SELECT password FROM players WHERE playerID =" . VAR(opponentsID)},//
+        new String[] { "SiFiWiQ", v },//
+        new String[] { "SiFiWiQ", "n" }//
+        ));
+
+    return res;
   }
 }
