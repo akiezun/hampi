@@ -11,7 +11,7 @@ import java.util.*;
 import jpaul.Graphs.*;
 
 /**
- * Converts the AST form the parser into a Hampi constraint.
+ * Converts the AST form the parser into a Hampi (core string) constraint.
  */
 public final class HConstraintPreparer{
 
@@ -107,11 +107,41 @@ public final class HConstraintPreparer{
     return hampi.rangeRegexp(ASCIITable.lowestChar, ASCIITable.highestChar);
   }
 
+  /*
+   * Processes expressions 'x in A'.
+   * A must be either a regular variable,
+   * or a context-free variable.
+   * In the latter case, bound inference is required.
+   */
   private Constraint prepareIn(HInExpression inExpr, HProgram ast){
-    Expression e1 = getExpandedExpression(inExpr.getVarName(), ast);
-    Regexp reg = prepareRegForVar(inExpr.getRegVarName(), ast);
-    assert reg != null : "null reg for " + inExpr.getRegVarName();
-    return hampi.regexpConstraint(e1, inExpr.isIn(), reg);
+    Expression exp = getExpandedExpression(inExpr.getVarName(), ast);
+    String varName = inExpr.getRegVarName();
+    HRegDeclStatement regDecl = ast.getRegDecl(varName);
+    if (regDecl != null){
+      //regular case
+      Regexp reg = prepareRegForVar(varName, ast);
+      assert reg != null : "null reg for " + inExpr.getRegVarName();
+      return hampi.regexpConstraint(exp, inExpr.isIn(), reg);
+    }else{
+      //context-free case
+      CFGStatement cfg = ast.getCFGDecl(varName);
+      assert cfg != null : "null cfg for " + inExpr.getRegVarName();
+      int boundSize = computeExpressionSize(exp, ast.getVarSize());
+      Regexp reg = prepareSizeFixRegexp(varName, boundSize, ast);
+      return hampi.regexpConstraint(exp, inExpr.isIn(), reg);
+    }
+  }
+
+  /*
+   * Compute the length of the expression given the size of the string variable.
+   */
+  private int computeExpressionSize(Expression exp, int varSize){
+    assert exp.getVariables().size() <= 1 : exp.getVariables().toString();//expect at most 1 var
+    Solution solution= Solution.createSAT();
+    if (!exp.getVariables().isEmpty()) {
+      solution.setValue(exp.getVariables().iterator().next(), Utils.spaces(varSize));
+    }
+    return exp.getValue(solution).length();
   }
 
   private Regexp prepareRegForVar(String varName, HProgram ast){
@@ -164,12 +194,24 @@ public final class HConstraintPreparer{
     return res;
   }
 
+  /*
+   * Creates the regular expression that describes
+   * all strings of given size in the CFG.
+   */
   private Regexp prepareSizeFixRegexp(HSizeFixRegDefinition fix, HProgram ast){
-    Grammar g = extractGrammar(fix.getNonterminal(), ast);
-    StopWatch w = new StopWatch("grammar bounding for " + fix.getNonterminal());
+    return prepareSizeFixRegexp(fix.getNonterminal(), fix.getSize(), ast);
+  }
+
+  /*
+   * Creates the regular expression that describes
+   * all strings of given size in the CFG.
+   */
+  private Regexp prepareSizeFixRegexp(String cfg, int size, HProgram ast){
+    Grammar g = extractGrammar(cfg, ast);
+    StopWatch w = new StopWatch("grammar bounding for " + cfg);
     w.start();
     GrammarStringBounder gsb = new GrammarStringBounder();
-    Regexp boundedRegexp = gsb.getBoundedRegexp(g, fix.getNonterminal(), fix.getSize(), false);
+    Regexp boundedRegexp = gsb.getBoundedRegexp(g, cfg, size, false);
     w.stop();
     System.out.println(w);
     if (boundedRegexp == null)

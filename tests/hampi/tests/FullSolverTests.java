@@ -182,6 +182,22 @@ public class FullSolverTests extends TestCase{
     doTest(true, Double.MAX_VALUE);
   }
 
+  public void testBoundInference1() throws Exception{
+    doTest(true, Double.MAX_VALUE);
+  }
+
+  public void testBoundInference2() throws Exception{
+    doTest(true, Double.MAX_VALUE);
+  }
+
+  public void testBoundInference3() throws Exception{
+    doTest(false, Double.MAX_VALUE);
+  }
+
+  public void testBoundInference4() throws Exception{
+    doTest(true, Double.MAX_VALUE);
+  }
+
   public void testRegression5() throws Exception{
     doTest(true, Double.MAX_VALUE);
   }
