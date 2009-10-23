@@ -6,6 +6,11 @@ import stp.Expr;
 /**
  * This is a lazy representation of a shifted STP expression. Instead of
  * shifting right away, this class delays the shifting until necessary.
+ *
+ * This class represents what the paper calls 'constraint templates'. It's a
+ * space- and time-efficient representation of related STP expressions. Shift of
+ * an STP expression e1 by i is represents an STP expression e2 that is
+ * identical to e1 but has every offset o of a character changed to o+i.
  */
 public final class ShiftedSTPExpr extends STPExpr{
 
