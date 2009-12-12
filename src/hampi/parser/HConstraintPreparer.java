@@ -16,9 +16,11 @@ import jpaul.Graphs.*;
 public final class HConstraintPreparer{
 
   private final Hampi hampi;
+  private final int varSize;
 
-  public HConstraintPreparer(Hampi hampi){
+  public HConstraintPreparer(Hampi hampi, int varSize){
     this.hampi = hampi;
+    this.varSize = varSize;
   }
 
   /**
@@ -126,7 +128,7 @@ public final class HConstraintPreparer{
       //context-free case
       CFGStatement cfg = ast.getCFGDecl(varName);
       assert cfg != null : "null cfg for " + inExpr.getRegVarName();
-      int boundSize = computeExpressionSize(exp, ast.getVarSize());
+      int boundSize = computeExpressionSize(exp, varSize);
       Regexp reg = prepareSizeFixRegexp(varName, boundSize, ast);
       return hampi.regexpConstraint(exp, inExpr.isIn(), reg);
     }

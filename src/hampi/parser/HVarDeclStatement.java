@@ -5,17 +5,28 @@ import hampi.parser.HProgramParser.HTypeEnvironment;
 public final class HVarDeclStatement extends HStatement{
 
   private final String name;
-  private final int    size;
+  private final int    sizeMin;
+  private final int    sizeMax;
 
   public HVarDeclStatement(String text, String size){
+      this(text, size, size);
+  }
+
+  public HVarDeclStatement(String text, String sizeMin, String sizeMax){
     super(HGrammarElementKind.STMT_VARDECL);
     this.name = text;
-    this.size = Integer.parseInt(size);
+    int s1 = Integer.parseInt(sizeMin);
+    int s2 = Integer.parseInt(sizeMax);
+    this.sizeMin = Math.min(s1, s2);
+    this.sizeMax = Math.max(s1, s2);
   }
 
   @Override
   public String unparse(){
-    return "var " + name + ":" + size + ";";
+    if (sizeMin == sizeMax)
+	return "var " + name + ":" + sizeMin + ";";
+    else
+        return "var " + name + ":" + sizeMin + ".." + sizeMax + ";";
   }
 
   /**
@@ -26,11 +37,19 @@ public final class HVarDeclStatement extends HStatement{
   }
 
   /**
-   * Returns the declared size of the variable.
+   * Returns the declared minimal size of the variable.
    */
-  public int getSize(){
-    return size;
+  public int getSizeMin(){
+    return sizeMin;
   }
+
+  /**
+   * Returns the declared maximal size of the variable.
+   */
+  public int getSizeMax(){
+    return sizeMax;
+  }
+
 
   @Override
   public void typeCheck(HTypeEnvironment tenv){

@@ -27,6 +27,7 @@ public class FullSolverTests extends TestCase{
           return;
         int exec = Command.exec(new String[] { "/bin/bash", "hampi_server.sh", PORT }, null);
         File hampiServer = new File(HampiServer.HAMPISERVER_RUNNING);
+        hampiServer.deleteOnExit();
         int count = 5;
         while (count > 0 && !hampiServer.exists()){
           Thread.sleep(500);//wait for the server to start
@@ -64,11 +65,12 @@ public class FullSolverTests extends TestCase{
     PrintStream blackHole = new PrintStream(os);
     StopWatch w = new StopWatch("");
     w.start();
-    int exec = Command.exec(new String[] { "/bin/bash", "hampi.sh", fname, "-v" }, blackHole);
+    String verbose = "";//"-v" if verbose
+	int exec = Command.exec(new String[] { "/bin/bash", "hampi.sh", fname, verbose }, blackHole);
     w.stop();
     if (exec != 0 && exec != 1){
       System.err.println("exit " + exec + "\n" + os);
-      fail(os.toString());
+      fail("unusual exit code:" + exec + "\n" + os);
     }
     System.out.println(os);
     return Pair.create(exec == 0, w.getTotal());
@@ -182,6 +184,10 @@ public class FullSolverTests extends TestCase{
     doTest(true, Double.MAX_VALUE);
   }
 
+  public void testMinMaxSize() throws Exception{
+    doTest(true, Double.MAX_VALUE);
+  }
+  
   public void testBoundInference1() throws Exception{
     doTest(true, Double.MAX_VALUE);
   }

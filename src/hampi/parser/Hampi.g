@@ -53,7 +53,9 @@ grammar Hampi;
 	          | assertStmt
 	          ;
 	          
-	vardeclStmt : (KW_VAR ID COLON INT) -> ^(VAR ID INT);
+	vardeclStmt :   (KW_VAR ID COLON INT '..' INT) -> ^(VAR ID INT INT)
+                 |  (KW_VAR ID COLON INT) -> ^(VAR ID INT)
+                ;
 	
 	cfgStmt : (KW_CFG cfgProduction) -> ^(CFG cfgProduction);
 	
