@@ -14,12 +14,23 @@ public final class HProgram extends HAbstractGrammarElement{
   }
 
   /**
-   * Returns the size of the declared variable
+   * Returns the minimal size of the declared variable
    */
-  public int getVarSize(){
+  public int getVarSizeMin(){
+    return getVarDecl().getSizeMin();
+  }
+
+  /**
+   * Returns the maximmal size of the declared variable
+   */
+  public int getVarSizeMax(){
+    return getVarDecl().getSizeMax();
+  }
+
+  private HVarDeclStatement getVarDecl(){
     List<HStatement> statements = getStatements(HGrammarElementKind.STMT_VARDECL);
     //there must be just one
-    return ((HVarDeclStatement) statements.get(0)).getSize();
+    return (HVarDeclStatement) statements.get(0);
   }
 
   public void add(HStatement stmt){

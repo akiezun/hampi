@@ -35,7 +35,15 @@ vardeclStmt returns [HStatement s = null]:
               {
                 s = new HVarDeclStatement(id.getText(), size.getText());
               }
-      ) ;
+      ) 
+    |
+  ^(VAR id=ID
+        sizeMin=INT
+        sizeMax=INT
+            { 
+              s = new HVarDeclStatement(id.getText(), sizeMin.getText(), sizeMax.getText());
+            }
+         );
 
 cfgStmt returns [CFGStatement s = new CFGStatement()]:
 ^(
