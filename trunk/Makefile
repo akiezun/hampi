@@ -11,6 +11,8 @@
 # LICENSE: Please view LICENSE file in the home dir of this Program
 #********************************************************************
 
+TDY = $(shell date +%Y%m%d)
+
 all:
 	./configure
 	$(MAKE) -C lib all
@@ -24,6 +26,9 @@ run-perftests:
 
 create-perftest-gold:
 	$(MAKE) -C slow-tests create-perftest-gold
+
+package:
+	zip -vr hampi_${TDY}.zip * -x \*.svn*
 
 clean:
 	ant clean

@@ -279,21 +279,25 @@ public final class Hampi{
     int sizeMin = parse.getVarSizeMin();
     int sizeMax = parse.getVarSizeMax();
     for(int size = sizeMin; size <= sizeMax; size++){
-      Constraint c = new HConstraintPreparer(hampi, size).prepare(parse);
-      assert c != null;
+      try{
+        Constraint c = new HConstraintPreparer(hampi, size).prepare(parse);
+        assert c != null;
         if (verbose){
-        //      System.out.println(parse);
-        hampi.getSolver().verbose = verbose;
+          //      System.out.println(parse);
+          hampi.getSolver().verbose = verbose;
+        }
+        Solution solve = hampi.solve(c, size);
+        if (verbose){ 
+           System.out.println("solution for size " + size + " " + solve);
+        }
+        if (solve.isSatisfiable()){
+           System.out.println(solve);
+	   return solve;
+        }
+      }catch(HampiResultException e){
+	  if (!e.isUnsat())
+	   throw e;
       }
-      Solution solve = hampi.solve(c, size);
-      if (solve.isSatisfiable()){
-          System.out.println(solve);
-	  return solve;
-      }
-      //if (!solve.isSatisfiable())
-      //  throw HampiResultException.unsat();
-      //System.out.println(solve);
-      //return solve;
     }
     throw HampiResultException.unsat();
   }
