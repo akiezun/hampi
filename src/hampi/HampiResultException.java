@@ -24,6 +24,10 @@ public final class HampiResultException extends RuntimeException{
     return code;
   }
 
+  public boolean isUnsat(){
+    return code == CODE_UNSAT;
+  }
+
   public static HampiResultException unsat(){
     return new HampiResultException("UNSAT", CODE_UNSAT);
   }
