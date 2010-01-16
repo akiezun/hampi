@@ -184,6 +184,10 @@ public class FullSolverTests extends TestCase{
     doTest(true, Double.MAX_VALUE);
   }
 
+  public void testPaperExample() throws Exception{
+      doTest(true, Double.MAX_VALUE);
+  }
+ 
   public void testMinMaxSize1() throws Exception{
     doTest(true, Double.MAX_VALUE);
   }
