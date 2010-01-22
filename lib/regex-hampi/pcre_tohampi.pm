@@ -259,9 +259,11 @@ sub pcre_tohampi::class::tohampi {
 						$n2 = $n2 + 0;
 						push @numarr,$n1..$n2;
 					}
-				} 
-				$c1=$slashhash{$c1} if ( length $c1 == 2);
-				push @numarr,ord($c1);
+				}else {
+				  $c1=$slashhash{$c1} if ( length $c1 == 2);
+                  die "error : $c1 is not a character " if (length $c1 != 1);
+			  	  push @numarr,ord($c1);
+                }
 				#print "just the char $c1 and value\n".ord($c1);
 			} 
            
