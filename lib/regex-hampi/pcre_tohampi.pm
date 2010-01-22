@@ -1,8 +1,7 @@
 package pcre_tohampi::Element;
 package pcre_tohampi;
 
-# To do .. flags like case insensitive matching etc.
-
+#author : Devdatta Akhawe
 use strict;
 use YAPE::Regex 'pcre_tohampi';
 
