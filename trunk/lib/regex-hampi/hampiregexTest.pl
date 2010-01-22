@@ -1,11 +1,12 @@
 #/usr/bin/perl -w
 #
-
 use strict;
 use lib '.';
 use pcre_tohampi;
+use Cwd 'chdir';
 
-
+my $startdir=$ENV{'PWD'};
+chdir('../..');
 while(<>){
   chomp;
   my $regex=$_;
@@ -27,3 +28,5 @@ while(<>){
     }
   }
 }
+
+chdir($startdir);
