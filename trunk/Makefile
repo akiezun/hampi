@@ -36,7 +36,7 @@ clean:
 	rm -rf *~
 	rm -rf *.sh
 
-verify:
+verify: all
 	$(MAKE) -C lib teststp
 	$(MAKE) -C lib/regex-hampi test-regexHampi
 	ant -lib lib -verbose AllTests
