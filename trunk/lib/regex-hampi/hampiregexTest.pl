@@ -1,5 +1,7 @@
 #/usr/bin/perl -w
 #
+#
+# Author : Devdatta Akhawe
 use strict;
 use lib '.';
 use pcre_tohampi;
