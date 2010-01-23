@@ -2,6 +2,7 @@ package pcre_tohampi::Element;
 package pcre_tohampi;
 
 #author : Devdatta Akhawe
+# Code under MIT License 
 use strict;
 use YAPE::Regex 'pcre_tohampi';
 
@@ -42,8 +43,25 @@ my %slashhash = (
   '\+' => "\+",
   '\?' => "\?",
   '\}' => "\}",
+  '\^' => "\^",
+  '\)' => "\)",
+  '\]' => "\]",
+  '\_' => "\_",
+  '\#' => "\#",
+  '\"' => "\"",
+  '\\\'' => "\'",
+  '\%' => "\%",
+  '\-' => "\-",
+  '\>' => "\>",
+  '\<' => "\<",
+  '\0' => "\0",
+  '\v' => "\v",
+  '\f' => "\f",
+  '\$' => "\$",
+  '\:' => "\:",
 );
 
+my $theregexstr="";
 
 
 my $cc_REx = qr{(
@@ -185,7 +203,15 @@ sub pcre_tohampi::macro::tohampi {
 	
 	}
 sub pcre_tohampi::oct::tohampi { die "oct unsupported"; }
-sub pcre_tohampi::hex::tohampi { die "hex unsupported" ; } 
+sub pcre_tohampi::hex::tohampi { 
+  my $self=shift;
+  my $rule= "";
+  if($self->text =~ m/\\x([0-9a-f]{2})/i){
+  $rule=numToHampi(hex($1));
+  }else { die "hex string not right"; }
+  return addRule(getNT(),$self->quant,$rule);
+
+   } 
 sub pcre_tohampi::utf8hex::tohampi { die "utf8hex unsupported" ; }
 sub pcre_tohampi::ctrl::tohampi { die "ctrl characters unsupported" ; }
 sub pcre_tohampi::named::tohampi { die "named expressions unsupported";}
@@ -244,11 +270,16 @@ sub pcre_tohampi::class::tohampi {
 	my @numarr=();
 	while ($class =~ s/^$cc_REx//) {
 		my ($c1, $name, $pP, $utf8, $neg, $posix) = ($1,$2,$3,$4,$5,$6);
+        #print "\n\t\t$c1 is c1\n";
 		if($utf8 or $posix){ die "don't know what to do here \n"; }
 		if ($c1 !~ /\\[wWdDsS]/ and $class =~ s/^-$cc_REx//) {
 				my ($c2, $name, $pP, $utf8, $neg, $posix) = ($1,$2,$3,$4,$5,$6);
-				#print "The class $c1-$c2\n";
-				push @numarr,$_ for(ord($c1)..ord($c2));
+                #print "\n\t\tThe class $c1-$c2\n";
+                my ($num1,$num2)=(ord($c1),ord($c2));
+                $num1 =hex( $1) if($c1 =~ m/\\x([a-f0-9]{2})/i);
+                $num2 = hex($1) if($c2 =~ m/\\x([a-f0-9]{2})/i);
+                #print "\n\t\tpushing $num1 to $num2\n";
+				push @numarr,$_ for($num1..$num2);
 			} else {
 				if ($c1 =~ /\\[wWdDsS]/){
 					my $hampistring = $exp{$c1};
@@ -259,9 +290,12 @@ sub pcre_tohampi::class::tohampi {
 						push @numarr,$n1..$n2;
 					}
 				}else {
-				  $c1=$slashhash{$c1} if ( length $c1 == 2);
-                  die "error : $c1 is not a character " if (length $c1 != 1);
-			  	  push @numarr,ord($c1);
+                  my $num=-1;
+                  $num = ord($c1) if (length $c1==1);
+				  $num=ord($slashhash{$c1}) if ( length $c1 == 2 and exists $slashhash{$c1});
+                  $num=hex($1) if ($c1 =~ m/\\x([a-f0-9]{2})/i);
+                  die "error with char $c1 in class ".$self->{TEXT} if (length $c1 != 0 and $num==-1);
+			  	  push @numarr,$num;
                 }
 				#print "just the char $c1 and value\n".ord($c1);
 			} 
@@ -330,7 +364,7 @@ sub pcre_tohampi::capture::tohampi {
 	#print $self->string; 
 	for my $child (@{$self->{CONTENT}}){
 		if($child->type eq "alt"){
-			die "found an alt but there was no previous choice" if $rhs eq "";
+			die "found an alt but there was no previous choice for regex $theregexstr" if $rhs eq "";
 			push @rhsarr,$rhs;
 			$rhs="";
 			next;
@@ -390,7 +424,8 @@ sub tothehampi{
 	
 	my @nodes=@{ $self->{TREE} };
 	my $regex=$self->display();
-	$case="";
+    $theregexstr=$regex;
+    $case="";
 	$case = "yes" if $regex =~ m/\([^-]*i-/;
 	$counter=0;
 	$capturenum=0;
