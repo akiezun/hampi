@@ -55,7 +55,7 @@ my %slashhash = (
   '\>' => "\>",
   '\<' => "\<",
   '\0' => "\0",
-  '\v' => "\v",
+#  '\v' => "\v",
   '\f' => "\f",
   '\$' => "\$",
   '\:' => "\:",
@@ -116,7 +116,12 @@ sub addRule{
         $count = ($rhs=~ tr/\\//) if ($fchar eq "\\");
          if ($fchar eq "q" || $fchar eq "f" || $fchar eq "a"){
            $count=1;
-          for my $qkey ( $rhs =~ m/flax\d+|q\d+|alpha[a-z]/g){
+          for my $qkey ( $rhs =~ m/flax\d+|q\d+|alpha[a-z]|\\\d{3}/g){
+            if ($qkey =~ m/\\\d{3}/ ){
+                $tmin+=1;
+                $tmax+=1 if $tmax!=-1;
+                next;
+            }
             die "$qkey not found " if ! exists $minhash{$qkey};
             $tmin+=$minhash{$qkey};
             $tmax=-1 if $maxhash{$qkey}==-1;
@@ -242,7 +247,7 @@ sub pcre_tohampi::text::tohampi {
 		for my $char (split(//,$str)){
 			my $asc=ord($char);
 	#		print "asc is $asc\n";
-			if($asc<97 || $asc>120){
+			if($asc<97 || $asc>122){
 				$rhs.=" ".charToHampi($char);
 			}else{
 				$rhs.=" alpha$char";
@@ -364,7 +369,7 @@ sub pcre_tohampi::capture::tohampi {
 	#print $self->string; 
 	for my $child (@{$self->{CONTENT}}){
 		if($child->type eq "alt"){
-			die "found an alt but there was no previous choice for regex $theregexstr" if $rhs eq "";
+			die "found an alt but there was no previous choice for".$self->fullstring if $rhs eq "";
 			push @rhsarr,$rhs;
 			$rhs="";
 			next;
