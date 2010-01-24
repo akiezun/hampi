@@ -23,15 +23,18 @@ while(<>){
   die "error calculating minimum for regex" if $min<0;
   open(HMP,'>','/tmp/foo.hmp') or die $!;
   print HMP "\nvar string:$min;\n$str\nassert string in flax0;\n";
+  #print HMP "\n cfg printablechar := [\\032-\\126];\n cfg printabletext := (printablechar)*;\n assert string in printabletext;\n";
   close(HMP);
   open(RES,"./hampi.sh /tmp/foo.hmp |") or die $!;
-  while(<RES>){
-    chomp;
-    if(m/^\{VAR\(string\)\=(.*?)\}$/i){
+  my $str="";
+  $str.=$_ while(<RES>);
+  close(RES);
+  if($str =~ m/\n\{VAR\(string\)\=(.*?)\}$/s){
       die "Failure for $regex\n" if $1 !~ $regex;
       print "SUCCESS for $regex\n";
+    } else {
+      die "$regex : couldn't find a solution from hampi\n";
     }
-  }
 }
 
 chdir($startdir);
