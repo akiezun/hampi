@@ -1,18 +1,146 @@
+#/usr/bin/perl -w
+
 package pcre_tohampi::Element;
 package pcre_tohampi;
 
-#author : Devdatta Akhawe
-# Code under MIT License 
+# Author : Devdatta Akhawe
+# Code under MIT License
 use strict;
 use YAPE::Regex 'pcre_tohampi';
+
+my $groupcntr=0;
+my %minhash=();
+my %maxhash=();
+
+sub qnormalize{
+  my ($min,$max,$quant)=@_;
+  return ($min,$max) if ($quant eq "");
+  return (0,-1) if ($quant eq "*");
+  return (0,$max) if ($quant eq "?");
+  return ($min,-1) if ($quant eq "+");
+  return ($min*$1,$max*$2) if ($quant =~ m/\{(\d+),(\d+)\}/);
+  return ($min*$1,-1) if ($quant =~ m/\{(\d+),\}/);
+}
+
+
+sub pcre_tohampi::anchor::minmax { die "Can't handle anchor\n";}
+sub pcre_tohampi::macro::minmax { return qnormalize(1,1,@_[0]->quant);}
+sub pcre_tohampi::oct::minmax { return qnormalize(1,1,@_[0]->quant);}
+sub pcre_tohampi::hex::minmax { return qnormalize(1,1,@_[0]->quant);} 
+sub pcre_tohampi::utf8hex::minmax { die "utf8hex unsupported" ; }
+sub pcre_tohampi::ctrl::minmax { die "ctrl characters unsupported" ; }
+sub pcre_tohampi::named::minmax { die "named expressions unsupported";}
+sub pcre_tohampi::Cchar::minmax { die "cchars unsupported";}
+sub pcre_tohampi::slash::minmax { return qnormalize(1,1,@_[0]->quant); }	
+sub pcre_tohampi::any::minmax { return qnormalize(1,1,@_[0]->quant);}
+sub pcre_tohampi::text::minmax { 
+  return qnormalize((length (@_[0]->text)),(length (@_[0]->text)),@_[0]->quant); }
+sub pcre_tohampi::alt::minmax { die " Can't handle alt\n"; }
+sub pcre_tohampi::backref::minmax { die "Can't handle backref\n";}
+sub pcre_tohampi::class::minmax { return qnormalize(1,1,@_[0]->quant);}
+sub pcre_tohampi::comment::minmax { die "can't handle comment\n"; }
+sub pcre_tohampi::whitespace::minmax { die "can't handle whitespace in regex \n";}
+sub pcre_tohampi::flags::minmax { die "can't handle flags \n";}
+sub pcre_tohampi::code::minmax { die "can't handle code\n"; }
+sub pcre_tohampi::later::minmax { die "can't handle later \n"; }
+sub pcre_tohampi::capture::minmax { 
+     my $self=shift;
+	my $themin=1000;
+	my $themax=0;
+	my ($tmin,$tmax)=(0,0);
+     my $flag="true";
+	for my $child (@{$self->{CONTENT}}){
+		if($child->type eq "alt"){
+			die "found an alt but there was no previous choice " if $flag;
+			$themin=$tmin if $tmin<$themin;
+			$themax=$tmax if ($tmax==-1);
+			$themax=$tmax if ($themax != -1 and $tmax > $themax);
+			($tmin,$tmax)=(0,0);
+			next;
+		}
+		
+		next if($child->type eq "anchor");
+		$flag="";
+		
+ 		my ($mn,$mx)=$child->minmax;
+#		print "\n child return $mn,$mx";
+		$tmin+=$mn;
+		next if $tmax==-1;
+		$tmax=$mx if $mx==-1;
+		$tmax+=$mx if $mx!=-1;
+    }
+    $themin=$tmin if $tmin<$themin;
+    $themax=$tmax if ($tmax==-1);
+    $themax=$tmax if ($themax != -1 and $tmax > $themax);
+    my ($a,$b)= qnormalize($themin,$themax,$self->quant);
+    $minhash{$groupcntr}=$a;
+    $maxhash{$groupcntr}=$b;
+    $groupcntr++;
+    #print "\ncapture returns $a,$b for".$self->fullstring."\n";
+    return ($a,$b);
+}
+
+
+  
+  
+
+sub pcre_tohampi::group::minmax { 
+     my $self=shift;
+	my $themin=1000;
+	my $themax=0;
+	my ($tmin,$tmax)=(0,0);
+     my $flag="true";
+	for my $child (@{$self->{CONTENT}}){
+		if($child->type eq "alt"){
+			die "found an alt but there was no previous choice " if $flag;
+			$themin=$tmin if $tmin<$themin;
+			$themax=$tmax if ($tmax==-1);
+			$themax=$tmax if ($themax != -1 and $tmax > $themax);
+			($tmin,$tmax)=(0,0);
+			next;
+		}
+		
+		$flag="";
+		next if($child->type eq "anchor");
+ 		my ($mn,$mx)=$child->minmax;
+		#print "\n child return $mn,$mx";
+		$tmin+=$mn;
+		next if $tmax==-1;
+		$tmax=$mx if $mx==-1;
+		$tmax+=$mx if $mx!=-1;
+    }
+    $themin=$tmin if $tmin<$themin;
+    $themax=$tmax if ($tmax==-1);
+    $themax=$tmax if ($themax != -1 and $tmax > $themax);
+    #print "\ngroup returns $themin,$themax with quant".$self->quant."\n";
+    return qnormalize($themin,$themax,$self->quant);
+}
+sub pcre_tohampi::cut::minmax { die " Can't handle cut \n"; }
+sub pcre_tohampi::lookahead::minmax { die "Can't handle lookahead\n"; }
+sub pcre_tohampi::lookbehind::minmax { die "Can't handle lookbehind\n"; }
+sub pcre_tohampi::conditional::minmax { die "Can't handle conditionals\n"; }
+sub getminmax{
+	my $self=shift;
+	my $targetgroup=shift || 0;
+	$groupcntr=1;
+	%minhash=();
+	%maxhash=();
+	for my $node (@{ $self->{TREE} }){
+	  my ($a,$b)= $node->minmax();
+	  $minhash{0}=$a;
+	  $maxhash{0}=$b;
+    
+    }
+    
+    return ($minhash{$targetgroup},$maxhash{$targetgroup});
+}
+
 
 my $case="";
 my $counter=0;
 my $capturenum=0;
 my @array=();
 my %casehash=();
-my %minhash=();
-my %maxhash=();
 my $valid_POSIX = qr{
   alpha | alnum | ascii | cntrl | digit | graph |
   lower | print | punct | space | upper | word | xdigit
@@ -99,60 +227,17 @@ sub getNT{
 
 sub addRule{
 	my ($nt,$quant,@rhsarr) = @_;
-    	my $l = scalar @rhsarr;
-    #print "\n\t\t length $l,$nt RHS is  @rhsarr";
-    	my $max=0;
-    	my $min=-1;
-	my $out="";
-	#print "for $nt the quantifier is $quant";
-	for my $rhs (@rhsarr){
-        $rhs =~ s/^\s+//;
-		$out.=" | " if $out;
-		$out.="$rhs";
-        my ($tmin,$tmax)=(0,0);
-        my $fchar = substr($rhs,0,1);
-        my $count="blahblah";
-        $count=1 if $fchar eq "[";
-        $count = ($rhs=~ tr/\\//) if ($fchar eq "\\");
-         if ($fchar eq "q" || $fchar eq "f" || $fchar eq "a"){
-           $count=1;
-          for my $qkey ( $rhs =~ m/flax\d+|q\d+|alpha[a-z]|\\\d{3}/g){
-            if ($qkey =~ m/\\\d{3}/ ){
-                $tmin+=1;
-                $tmax+=1 if $tmax!=-1;
-                next;
-            }
-            die "$qkey not found " if ! exists $minhash{$qkey};
-            $tmin+=$minhash{$qkey};
-            $tmax=-1 if $maxhash{$qkey}==-1;
-            next if $tmax==-1;
-            $tmax+=$maxhash{$qkey};
-          }
-        }else { ($tmin,$tmax)=($count,$count)}
-
-        die " eh what is this :$rhs " if $count eq "blahblah"; 
-        $min = $tmin if ( ($min > $tmin) || $min==-1);
-        $max = $tmax if (($max < $tmax && $max!=-1)||$tmax==-1);
-        
-	}
-    #print "max : $max min : $min";
-	my $rule="cfg $nt := $out;";
-    $maxhash{$nt}=$max;
-    $minhash{$nt}=$min;
-	push @array,$rule;
+    	my $out=join(" | ",@rhsarr);
+	my $rule="cfg $nt := ".join(" | ",@rhsarr)." ;";
+    	push @array,$rule;
+	return $nt if ($quant eq "");
 	#print STDERR "$rule\n";
 	my $newnt=$nt;
 	if ( $quant eq "+" or $quant eq "*" or $quant eq "?" ){
 		$newnt=getNT();
-		#my $extrarule="cfg $newnt := $nt $newnt | $nt ;";
 		my $extrarule="cfg $newnt := ($nt)$quant;";
 		push @array,$extrarule;
-        $min = 0 if ($quant eq "*" || $quant eq "?");
-        $max = -1 if ($quant eq "*" || $quant eq "+");
-        $maxhash{$newnt}=$max;
-        $minhash{$newnt}=$min;
-		#print STDERR "$extrarule\n";
-	}
+     }
 	
 	if ( $quant =~ /\{(\d+),\}/){
 		my $n1 = $1;
@@ -162,9 +247,8 @@ sub addRule{
 		push @array,$extrarule;
 		$extrarule="cfg $tempnt := ($nt)* ; ";
 		push @array,$extrarule;
-        $minhash{$newnt} = $min * $n1;
-        $maxhash{$newnt} = -1;
-	}
+     }
+	
 	if ( $quant =~ /\{(\d+),(\d+)\}/){
 		my ($n1,$n2)=($1,$2);
 		die "quantifier messed up first quantifier should be less than the second " if $n2 < $n1;
@@ -173,23 +257,15 @@ sub addRule{
 		my $extrarule = join "| ",@rulearr;
 		$newnt = getNT();
 		$extrarule="cfg $newnt := $extrarule;";	
-		#print STDERR "$extrarule\n";
 		push @array,$extrarule;
-        $minhash{$newnt}=$min*$n1;
-        $maxhash{$newnt}=$max*$n2;
-				
-	}
+     }
 	
 	if ( $quant =~ /\{(\d*)\}/ ){
         my $n = $1;
-		my $extrarule = "$nt " x $n;
-		$newnt = getNT();
-		$extrarule = "cfg $newnt := $extrarule;";
-		push @array,$extrarule;
-        $minhash{$newnt}=$min*$n;
-        $maxhash{$newnt}=$max*$n;
-		#print STDERR "$extrarule\n";
-		
+	   my $extrarule = "$nt " x $n;
+	   $newnt = getNT();
+	   $extrarule = "cfg $newnt := $extrarule;";
+	   push @array,$extrarule;
 	}
 		
 	
@@ -206,7 +282,8 @@ sub pcre_tohampi::macro::tohampi {
 	my $self=shift;	
 	return addRule(getNT(),$self->quant,$exp{$self->text});
 	
-	}
+}
+
 sub pcre_tohampi::oct::tohampi { die "oct unsupported"; }
 sub pcre_tohampi::hex::tohampi { 
   my $self=shift;
@@ -215,8 +292,7 @@ sub pcre_tohampi::hex::tohampi {
   $rule=numToHampi(hex($1));
   }else { die "hex string not right"; }
   return addRule(getNT(),$self->quant,$rule);
-
-   } 
+} 
 sub pcre_tohampi::utf8hex::tohampi { die "utf8hex unsupported" ; }
 sub pcre_tohampi::ctrl::tohampi { die "ctrl characters unsupported" ; }
 sub pcre_tohampi::named::tohampi { die "named expressions unsupported";}
@@ -251,8 +327,6 @@ sub pcre_tohampi::text::tohampi {
 				$rhs.=" ".charToHampi($char);
 			}else{
 				$rhs.=" alpha$char";
-				$minhash{"alpha$char"}=1;
-				$maxhash{"alpha$char"}=1;
 				$casehash{$char}="yes";
 			}
 		}
@@ -376,6 +450,7 @@ sub pcre_tohampi::capture::tohampi {
 		}
 		
 		next if($child->type eq "anchor");
+		  
 		
 		
 		my $othernt = $child->tohampi;
@@ -383,7 +458,7 @@ sub pcre_tohampi::capture::tohampi {
 			
 	}
 	
-	push @rhsarr,$rhs if $rhs;
+	push @rhsarr,$rhs ;
 	return addRule($nt,$self->quant,@rhsarr);
 	#now using the 
 	
@@ -409,12 +484,13 @@ sub pcre_tohampi::group::tohampi {
 		next if($child->type eq "anchor");
 		
 		
+		
 		my $othernt = $child->tohampi;
 		$rhs.=" $othernt";
 			
 	}
 	
-	push @rhsarr,$rhs if $rhs;
+	push @rhsarr,$rhs;
 	return addRule($nt,$self->quant,@rhsarr);
 	
 	
@@ -435,8 +511,6 @@ sub tothehampi{
 	$counter=0;
 	$capturenum=0;
 	@array=();
-	%minhash=();
-	%maxhash=();
 	%casehash=();
 
 	for my $node (@nodes){
@@ -449,11 +523,11 @@ sub tothehampi{
 				push @array,"cfg alpha$char := ".charToHampi($char)." | ".charToHampi(uc($char)).";";
 			}
 		}			
-        return (join("\n",@array),$minhash{$finalrule},$maxhash{$finalrule});
-#		printAllRules();
-		
-		#aaaaaaaaaaaaaaaargh
-		
+        return join("\n",@array);
+	
 	}
 }
+
+
+
 1;

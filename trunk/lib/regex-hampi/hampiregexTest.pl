@@ -7,19 +7,19 @@ use strict;
 use lib '.';
 use pcre_tohampi;
 use Cwd 'chdir';
-
 my $startdir=$ENV{'PWD'};
 chdir('../..');
 while(<>){
   chomp;
   my $regex=$_;
+  next if $regex =~ m/^#/;
   #$regex=$1.$2 if( $regex =~ m/(\/.*?[^\\]\/[^\/g]*)g([^\/g]*)/);
   $regex=$1.$2 if( $regex =~ m/^(.*?)g([^\/]*)$/);
   $regex=eval 'qr'.$regex;
   my $p= pcre_tohampi->new($regex);
   $p->parse;
-  my ($str,$min,$max)=$p->tothehampi();
-  $min = 1 if $min==0;
+  my ($min,$max)=$p->getminmax();
+  my $str=$p->tothehampi();
   die "error calculating minimum for regex" if $min<0;
   open(HMP,'>','/tmp/foo.hmp') or die $!;
   print HMP "\nvar string:$min;\n$str\nassert string in flax0;\n";
