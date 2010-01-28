@@ -1,0 +1,28 @@
+The subversion repository currently contains a perl script that can automatically convert most regular expressions to the Hampi grammar format. Please check out the code from svn. The instructions for using it are below.
+
+=== Requirements ===
+
+The script should work on any reasonably new version of Perl 5. It was developed on a linux machine, but is also known to work on Mac.
+
+=== Usage ===
+
+Usage is pretty simple, and is easiest to explain via a sample code block:
+{{{
+#use the current directory for library includes
+# if you have the pcre_tohampi.pm and YAPE folder 
+# somewhere else, change this accordingly
+use lib '.'; 
+use pcre_tohampi; # include the library
+
+#create a object from the particular regular expression.
+my $p=pcre_tohampi->new(qr/abc/);
+$p->parse;
+print $p->tothehampi();
+}}}
+
+The main non-terminal will be flax0. flax1,flax2... are also non terminals that match the capturing groups inside the regular expression.
+
+For a more complete example see the hampiregexTest.pl file in the same directory. The hampiregexTest.pl script takes a list of regular expressions as input, converts them to Hampi's format, calls Hampi on it and then checks the result to see if it belongs to the input regular expression. For e.g, try running the following :
+{{{
+perl hampiregexTest.pl < sampleRegex
+}}}
