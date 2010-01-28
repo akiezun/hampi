@@ -20,9 +20,13 @@ $p->parse;
 print $p->tothehampi();
 }}}
 
-The main non-terminal will be flax0. flax1,flax2... are also non terminals that match the capturing groups inside the regular expression.
+The non-terminal _flax0_ will match the whole regular expression. _flax1_,_flax2_ etc. are non terminals that match the nthcapturing groups inside the regular expression.
 
 For a more complete example see the hampiregexTest.pl file in the same directory. The hampiregexTest.pl script takes a list of regular expressions as input, converts them to Hampi's format, calls Hampi on it and then checks the result to see if it belongs to the input regular expression. For e.g, try running the following :
 {{{
 perl hampiregexTest.pl < sampleRegex
 }}}
+
+=== Acknowledgements ===
+
+Thanks to Jeff Pinyan for kindly agreeing to release his nice YAPE toolset in the MIT license. Thanks also to Stephen !McCamant for a lot of help during coding this tool.
