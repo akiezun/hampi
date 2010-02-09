@@ -190,6 +190,7 @@ my %slashhash = (
   '\$' => "\$",
   '\:' => "\:",
   '\@' => "\@",
+  '\|' => "\|",
 );
 
 my $theregexstr="";
@@ -505,7 +506,7 @@ sub pcre_tohampi::conditional::tohampi { die "Can't handle conditionals\n"; }
 
 sub tothehampi{
 	my $self=shift;
-	$prefix=shift;
+	$prefix=shift || "";
 	my @nodes=@{ $self->{TREE} };
 	my $regex=$self->display();
       
