@@ -4,11 +4,13 @@
 # Author : Devdatta Akhawe
 # Code under MIT license 
 use strict;
+use warnings;
 use lib '.';
 use pcre_tohampi;
 use Cwd 'chdir';
 my $startdir=$ENV{'PWD'};
 chdir('../..');
+my $count=0;
 while(<>){
   chomp;
   my $regex=$_;
@@ -19,14 +21,15 @@ while(<>){
   my $p= pcre_tohampi->new($regex);
   $p->parse;
   my ($min,$max)=$p->getminmax();
-  my $str=$p->tothehampi();
+  my $str=$p->tothehampi($count);
   die "error calculating minimum for regex" if $min<0;
   open(HMP,'>','/tmp/foo.hmp') or die $!;
-  print HMP "\nvar string:$min;\n$str\nassert string in flax0;\n";
+  print HMP "\nvar string:$min;\n$str\nassert string in $count\_flax0;\n";
+  $count++;
   #print HMP "\n cfg printablechar := [\\032-\\126];\n cfg printabletext := (printablechar)*;\n assert string in printabletext;\n";
   close(HMP);
   open(RES,"./hampi.sh /tmp/foo.hmp |") or die $!;
-  my $str="";
+  $str="";
   $str.=$_ while(<RES>);
   close(RES);
   if($str =~ m/\n\{VAR\(string\)\=(.*?)\}$/s){
