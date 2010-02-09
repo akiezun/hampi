@@ -6,6 +6,7 @@ package pcre_tohampi;
 # Author : Devdatta Akhawe
 # Code under MIT License
 use strict;
+use warnings;
 use YAPE::Regex 'pcre_tohampi';
 
 my $groupcntr=0;
@@ -24,20 +25,20 @@ sub qnormalize{
 
 
 sub pcre_tohampi::anchor::minmax { die "Can't handle anchor\n";}
-sub pcre_tohampi::macro::minmax { return qnormalize(1,1,@_[0]->quant);}
-sub pcre_tohampi::oct::minmax { return qnormalize(1,1,@_[0]->quant);}
-sub pcre_tohampi::hex::minmax { return qnormalize(1,1,@_[0]->quant);} 
+sub pcre_tohampi::macro::minmax { return qnormalize(1,1,$_[0]->quant);}
+sub pcre_tohampi::oct::minmax { return qnormalize(1,1,$_[0]->quant);}
+sub pcre_tohampi::hex::minmax { return qnormalize(1,1,$_[0]->quant);} 
 sub pcre_tohampi::utf8hex::minmax { die "utf8hex unsupported" ; }
 sub pcre_tohampi::ctrl::minmax { die "ctrl characters unsupported" ; }
 sub pcre_tohampi::named::minmax { die "named expressions unsupported";}
 sub pcre_tohampi::Cchar::minmax { die "cchars unsupported";}
-sub pcre_tohampi::slash::minmax { return qnormalize(1,1,@_[0]->quant); }	
-sub pcre_tohampi::any::minmax { return qnormalize(1,1,@_[0]->quant);}
+sub pcre_tohampi::slash::minmax { return qnormalize(1,1,$_[0]->quant); }	
+sub pcre_tohampi::any::minmax { return qnormalize(1,1,$_[0]->quant);}
 sub pcre_tohampi::text::minmax { 
-  return qnormalize((length (@_[0]->text)),(length (@_[0]->text)),@_[0]->quant); }
+  return qnormalize((length ($_[0]->text)),(length ($_[0]->text)),$_[0]->quant); }
 sub pcre_tohampi::alt::minmax { die " Can't handle alt\n"; }
 sub pcre_tohampi::backref::minmax { die "Can't handle backref\n";}
-sub pcre_tohampi::class::minmax { return qnormalize(1,1,@_[0]->quant);}
+sub pcre_tohampi::class::minmax { return qnormalize(1,1,$_[0]->quant);}
 sub pcre_tohampi::comment::minmax { die "can't handle comment\n"; }
 sub pcre_tohampi::whitespace::minmax { die "can't handle whitespace in regex \n";}
 sub pcre_tohampi::flags::minmax { die "can't handle flags \n";}
@@ -106,6 +107,7 @@ sub pcre_tohampi::group::minmax {
 		#print "\n child return $mn,$mx";
 		$tmin+=$mn;
 		next if $tmax==-1;
+		next unless $mx;
 		$tmax=$mx if $mx==-1;
 		$tmax+=$mx if $mx!=-1;
     }
@@ -187,10 +189,11 @@ my %slashhash = (
   '\f' => "\f",
   '\$' => "\$",
   '\:' => "\:",
+  '\@' => "\@",
 );
 
 my $theregexstr="";
-
+my $prefix="";
 
 my $cc_REx = qr{(
   \\[0-3][0-7]{2} |
@@ -222,7 +225,7 @@ sub charToHampi{
 
 sub getNT{
 	$counter++;
-	return "q$counter";
+	return "$prefix\_q$counter";
 }
 
 sub addRule{
@@ -326,7 +329,7 @@ sub pcre_tohampi::text::tohampi {
 			if($asc<97 || $asc>122){
 				$rhs.=" ".charToHampi($char);
 			}else{
-				$rhs.=" alpha$char";
+				$rhs.=" $prefix\_alpha$char";
 				$casehash{$char}="yes";
 			}
 		}
@@ -435,7 +438,7 @@ sub pcre_tohampi::capture::tohampi {
 	# this is a non capturing group
 	my $self=shift; 
 	$capturenum++;
-	my $nt = "flax$capturenum";
+	my $nt = "$prefix\_flax$capturenum";
 	
 	my @rhsarr=();
 	my $rhs="";
@@ -502,11 +505,12 @@ sub pcre_tohampi::conditional::tohampi { die "Can't handle conditionals\n"; }
 
 sub tothehampi{
 	my $self=shift;
-	
+	$prefix=shift;
 	my @nodes=@{ $self->{TREE} };
 	my $regex=$self->display();
-    $theregexstr=$regex;
-    $case="";
+      
+	$theregexstr=$regex;
+	$case="";
 	$case = "yes" if $regex =~ m/\([^-]*i-/;
 	$counter=0;
 	$capturenum=0;
@@ -516,11 +520,11 @@ sub tothehampi{
 	for my $node (@nodes){
 		my $finalrule=$node->tohampi();
 		
-		my $rule = "cfg flax0 := $finalrule;\n";
+		my $rule = "cfg $prefix\_flax0 := $finalrule;\n";
 		push @array,$rule;
 		if($case){
 			for my $char (keys %casehash){
-				push @array,"cfg alpha$char := ".charToHampi($char)." | ".charToHampi(uc($char)).";";
+				push @array,"cfg $prefix\_alpha$char := ".charToHampi($char)." | ".charToHampi(uc($char)).";";
 			}
 		}			
         return join("\n",@array);
