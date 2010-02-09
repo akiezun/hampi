@@ -21,10 +21,10 @@ while(<>){
   my $p= pcre_tohampi->new($regex);
   $p->parse;
   my ($min,$max)=$p->getminmax();
-  my $str=$p->tothehampi($count);
+  my $str=$p->tothehampi();
   die "error calculating minimum for regex" if $min<0;
   open(HMP,'>','/tmp/foo.hmp') or die $!;
-  print HMP "\nvar string:$min;\n$str\nassert string in $count\_flax0;\n";
+  print HMP "\nvar string:$min;\n$str\nassert string in \_flax0;\n";
   $count++;
   #print HMP "\n cfg printablechar := [\\032-\\126];\n cfg printabletext := (printablechar)*;\n assert string in printabletext;\n";
   close(HMP);
