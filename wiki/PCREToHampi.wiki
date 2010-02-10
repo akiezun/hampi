@@ -17,10 +17,34 @@ use pcre_tohampi; # include the library
 #create a object from the particular regular expression.
 my $p=pcre_tohampi->new(qr/abc/);
 $p->parse;
-print $p->tothehampi();
+print $p->tothehampi('prefix');
 }}}
 
-The non-terminal _flax0_ will match the whole regular expression. _flax1_,_flax2_ etc. are non terminals that match the nthcapturing groups inside the regular expression.
+The non-terminal _prefix_flax0_ will match the whole regular expression. _prefix_flax1_,_prefix_flax2_ etc. are non terminals that match the nthcapturing groups inside the regular expression.
+
+=== Strings to Regex Object ===
+
+Ofcourse, any practical usage would involve input which would be in the form of strings. Converting these strings to regular expressions is a little tricky. The following code can work :
+{{{
+my $str="/abc/";
+my $regex=eval 'qr'.$str;
+}}}
+
+The problem is that, by default, qr with the forward slash as a delimiter interpolates. In particular, the @ character is considered start of an array. To circumvent this, you can escape the @ character by changing it to a \@.
+{{{
+my $str="/a@bc/";
+$str=~ s/@/\@/g;
+my $regex=eval 'qr'.$str;
+}}}
+
+Another option is to use a different delimiter. In particular the single quote delimiter doesn't interpolate. Ofcourse, it has to be escaped before being used a delimiter. The following works :
+{{{
+//let input be the string a@bc
+my $str=<INP>;
+$str=~s/'/\'/g;
+my $regex= eval 'qr'."'$str'";
+}}}
+
 
 For a more complete example see the hampiregexTest.pl file in the same directory. The hampiregexTest.pl script takes a list of regular expressions as input, converts them to Hampi's format, calls Hampi on it and then checks the result to see if it belongs to the input regular expression. For e.g, try running the following :
 {{{
