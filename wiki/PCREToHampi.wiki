@@ -33,7 +33,7 @@ my $regex=eval 'qr'.$str;
 The problem is that, by default, qr with the forward slash as a delimiter interpolates. In particular, the @ character is considered start of an array. To circumvent this, you can escape the @ character by changing it to a \@.
 {{{
 my $str="/a@bc/";
-$str=~ s/@/\@/g;
+$str=~ s/@/\\@/g;
 my $regex=eval 'qr'.$str;
 }}}
 
