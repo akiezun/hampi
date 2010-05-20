@@ -47,29 +47,31 @@ public class STPSolver extends AbstractSolver{
   }
 
   @Override
-  public Solution solve(Constraint c, int size){
+  public Solution solve(Constraint constraint, int size){
     try{
       if (verbose){
         System.out.println();
         System.out.println("size:" + size);
         //                System.out.println(c);
       }
-      if (c.getConjuncts().isEmpty())
+      if (constraint.getConjuncts().isEmpty())
         return Solution.createSAT();
 
-      Solution simpleSolution = trySimpleCases(c);
+      Solution simpleSolution = trySimpleCases(constraint);
       if (simpleSolution != null)
         return simpleSolution;
 
-      if (c.getVariables().size() != 1)
+      if (constraint.getVariables().size() != 1)
         throw new UnsupportedOperationException("multi-variable constraints are not supported yet");
 
-      int min = c.varLengthLowerBound();
+      int min = constraint.varLengthLowerBound();
 
       if (size < min)
         return Solution.createUNSAT(); //cut this short
 
-      VariableExpression v = c.getVariables().iterator().next();
+      VariableExpression v = constraint.getVariables().iterator().next();
+      Constraint c = addVarInSigmaStarConstraint(constraint, v);
+
       if (size == 0 && min == 0){//try empty string without calling STP
         Solution emptyStringSol = Solution.createSAT();
         emptyStringSol.setValue(v, "");
@@ -112,7 +114,8 @@ public class STPSolver extends AbstractSolver{
           return Solution.createUNSAT();
       }
       STPExpr stpFormula = AndExpr.create(this, expressions);
-      STPExpr fullFormula = AndExpr.create(this, stpFormula, linkVars(c.getConjuncts(), bvs, bvLens, varlength));
+      STPExpr stpVarFormula = AndExpr.create(this, stpFormula, linkVars(c.getConjuncts(), bvs, bvLens, varlength));
+      STPExpr fullFormula = AndExpr.create(this, stpVarFormula, linkSubsequenceVars(c.getConjuncts(), bvs, bvLens, varlength));
       createTimer.stop();
       List<STPExpr> alternatives;
       if (OPT_TOP_DISJ_SPLIT && fullFormula.getKind() == STPExprKind.OrExpr){
@@ -172,6 +175,21 @@ public class STPSolver extends AbstractSolver{
   }
 
   /**
+   * Adding a constraint that the variable is in the sigma^star. This ensures
+   * that there is always a constraint on the original variable (and not only on
+   * subsequences of the var) and allows the comparison of subsequences to the
+   * bit vector created by this constraint. The code is duplicated since the
+   * Hampi object is not available here.
+   */
+
+  private Constraint addVarInSigmaStarConstraint(Constraint constraint, VariableExpression v){
+    Regexp sigma = HampiConstraints.rangeRegexp(ASCIITable.lowestChar, ASCIITable.highestChar);
+    Regexp sigmaStar = HampiConstraints.starRegexp(sigma);
+    Constraint varInSigma = HampiConstraints.regexpConstraint(v, true, sigmaStar);
+    return HampiConstraints.andConstraint(varInSigma, constraint);
+  }
+
+  /**
    * Returns the size of bitvector (in chars) given the size of var (in chars)
    */
   private int getBVLength(int varlength, RegexpConstraint c){
@@ -185,20 +203,12 @@ public class STPSolver extends AbstractSolver{
   }
 
   /**
-   * Returns the solved value for the variable, or null if there is no variable
-   * at all.
+   * Returns the solved value for the variable.
    */
   private String decodeValue(SolvingContext sc, List<RegexpConstraint> conjuncts, BVExpr[] bvs, int varLen){
-    for (int i = 0; i < bvs.length; i++){
-      RegexpConstraint c = conjuncts.get(i);
-      if (!c.getVariables().isEmpty()){
-        String fullBVDecoded = encoding.decodeValue(sc.getVC(), bvs[i].getExpr(sc, 0));
-        List<Integer> varOffsets = varOffset(c, varLen, varLen);
-        int varOffset = varOffsets.get(0);//just take the first
-        return fullBVDecoded.substring(varOffset, varOffset + varLen);
-      }
-    }
-    return null;
+    //The first constraint asserts that the variable is in sigma*
+    //and thus it can be used to decode the result
+    return encoding.decodeValue(sc.getVC(), bvs[0].getExpr(sc, 0));
   }
 
   /**
@@ -222,11 +232,16 @@ public class STPSolver extends AbstractSolver{
           offsets.add(constLen);
           constLen += varLen;
         }
+        if (sub.getKind() == ElementKind.SUBSEQUENCE_EXPRESSION){
+          constLen += ((SubsequenceExpression) sub).getLength();
+        }
         if (sub.getKind() == ElementKind.CONCAT_EXPRESSION)
           throw new IllegalArgumentException("should not have nested concats: " + c);
       }
     }else if (expr.getKind() == ElementKind.VAR_EXPRESSION){
       offsets.add(0);
+    }else if (expr.getKind() == ElementKind.SUBSEQUENCE_EXPRESSION){
+      //Nothing since we don't care about the starting index of subsequence
     }else
       throw new IllegalStateException("unexpected constraint " + c);
     return offsets;
@@ -252,6 +267,92 @@ public class STPSolver extends AbstractSolver{
     }
     return allEqual(expressions);
   }
+
+  /**
+   * Creates an expression that means: each subsequence is equal to the
+   * appropriate part of the original variable
+   */
+  private STPExpr linkSubsequenceVars(List<RegexpConstraint> conjuncts, BVExpr[] bvs, int[] bvLens, int varlength){
+    if (bvs.length == 0)
+      return trueExpr();
+    Map<SubsequenceExpression, List<Pair<Integer, Integer>>> subsequencesOffsets = subsequenceValOffsets(conjuncts, varlength);
+    List<STPExpr> valEqualExpressions = new ArrayList<STPExpr>(conjuncts.size());
+    for (SubsequenceExpression subsequence : subsequencesOffsets.keySet()){
+      List<Pair<Integer, Integer>> subsequenceOffsets = subsequencesOffsets.get(subsequence);
+      List<STPExpr> valExpressions = new ArrayList<STPExpr>(conjuncts.size());
+      for (Pair<Integer, Integer> subsequenceOffset : subsequenceOffsets){
+        int enc = encodingSize();
+        STPExpr encoded = bvs[subsequenceOffset.first].extract(enc * (subsequenceOffset.second + subsequence.getLength()) - 1, enc * subsequenceOffset.second, enc);
+        valExpressions.add(encoded);
+      }
+      int enc = encodingSize();
+      //adding the position of the subsequence in the bit vector for the variable
+      valExpressions.add(bvs[0].extract(enc * (subsequence.getStartIndex() + subsequence.getLength()) - 1, enc * subsequence.getStartIndex(), enc));
+      valEqualExpressions.add(allEqual(valExpressions));
+    }
+    return and(valEqualExpressions);
+  }
+
+  private STPExpr and(List<STPExpr> expressions){
+    if (expressions.size() < 1)
+      return trueExpr();
+    STPExpr result = trueExpr();
+    for (STPExpr e : expressions){
+        result = AndExpr.create(this, result, e);
+    }
+    return result;
+  }
+
+  /**
+   * Returns the offset of the each subsequence val in all bit vectors.
+   *
+   */
+  private Map<SubsequenceExpression, List<Pair<Integer, Integer>>> subsequenceValOffsets(List<RegexpConstraint> conjuncts, int varlength){
+    Map<SubsequenceExpression,List<Pair<Integer, Integer>>> result = new LinkedHashMap<SubsequenceExpression,List<Pair<Integer, Integer>>>();
+    for (int i = 0; i < conjuncts.size(); i++){
+      RegexpConstraint c = conjuncts.get(i);
+      Expression expr = c.getExpression();
+      if (expr.getKind() == ElementKind.CONCAT_EXPRESSION){
+        ConcatExpression ce = (ConcatExpression) expr;
+        List<Expression> subs = ce.getSubexpressions();
+        int constLen = 0;
+        for (Expression sub : subs){
+          if (sub.getKind() == ElementKind.CONST_EXPRESSION){
+            ConstantExpression constExpr = (ConstantExpression) sub;
+            String str = constExpr.getString();
+            constLen += str.length();
+          }
+          if (sub.getKind() == ElementKind.VAR_EXPRESSION){
+            constLen += varlength;
+          }
+          if (sub.getKind() == ElementKind.SUBSEQUENCE_EXPRESSION){
+            SubsequenceExpression subsequenceExpr = (SubsequenceExpression) sub;
+            List<Pair<Integer, Integer>> offsets = result.get(subsequenceExpr);
+            if(offsets==null){
+              offsets = new ArrayList<Pair<Integer, Integer>>();
+            }
+            offsets.add(Pair.create(i, constLen));
+            result.put(subsequenceExpr, offsets);
+            constLen += subsequenceExpr.getLength();
+          }
+          if (sub.getKind() == ElementKind.CONCAT_EXPRESSION)
+            throw new IllegalArgumentException("should not have nested concats: " + c);
+        }
+      }else if (expr.getKind() == ElementKind.SUBSEQUENCE_EXPRESSION){
+        SubsequenceExpression subsequenceExpr = (SubsequenceExpression) expr;
+        List<Pair<Integer, Integer>> offsets = result.get(subsequenceExpr);
+        if (offsets == null){
+          offsets = new ArrayList<Pair<Integer, Integer>>();
+        }
+        offsets.add(Pair.create(i, 0));
+        result.put(subsequenceExpr, offsets);
+      }
+    }
+    return result;
+  }
+
+
+
 
   /**
    * Returns the number of bits per character in the encoding.
@@ -290,7 +391,7 @@ public class STPSolver extends AbstractSolver{
 
     //fixing the constant prefix and suffix
     Expression expr = rc.getExpression();
-    if (expr.getKind() == ElementKind.VAR_EXPRESSION)
+    if (expr.getKind() == ElementKind.VAR_EXPRESSION || expr.getKind() == ElementKind.SUBSEQUENCE_EXPRESSION)
       return rc.isMembership() ? tryLength : NotExpr.create(tryLength, this);
     if (expr.getKind() == ElementKind.CONCAT_EXPRESSION){
       if (tryLength.equals(falseExpr()) && rc.isMembership())
@@ -314,6 +415,9 @@ public class STPSolver extends AbstractSolver{
         }
         if (sub.getKind() == ElementKind.VAR_EXPRESSION){
           offsetSoFar += varLen;
+        }
+        if (sub.getKind() == ElementKind.SUBSEQUENCE_EXPRESSION){
+          offsetSoFar +=((SubsequenceExpression)sub).getLength();
         }
         if (sub.getKind() == ElementKind.CONCAT_EXPRESSION)
           throw new IllegalArgumentException("should not have nested concats: " + rc);

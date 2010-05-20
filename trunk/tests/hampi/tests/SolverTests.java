@@ -159,7 +159,7 @@ public class SolverTests extends TestCase{
     System.out.println(c);
     for (Solution sol : solve(h, c, 27, stp())){
       assertTrue(sol.isSatisfiable());
-      assertEquals("<script >alert(1);</script>", sol.getValue(v1));
+      assertEquals("< script>alert(1);</script>", sol.getValue(v1));
     }
   }
 
@@ -897,6 +897,93 @@ public class SolverTests extends TestCase{
       assertEquals("tigerrorwanda", solution.getValue(v1));
     }
   }
+/**
+ * var v:5;
+   val prefix := v[0:2];
+   val suffix := v[2:3];
+   reg r1 := star("a");
+   reg r2 := star("b");
+   assert prefix in r1;
+   assert suffix in r2;
+   //expecting aabbb
+ */
+  public void testSubsequenceConstraints() throws Exception{
+    Hampi h = new Hampi();
+    Expression v = h.varExpr("v");
+    Expression prefix = h.subsequenceExpr(v, 0, 2);
+    Expression suffix = h.subsequenceExpr(v, 2, 3);
+    Regexp r1 = h.starRegexp(h.constRegexp('a'));
+    Regexp r2 = h.starRegexp(h.constRegexp('b'));
+
+    Constraint c1 = h.regexpConstraint(prefix, true, r1);
+    Constraint c2 = h.regexpConstraint(suffix, true, r2);
+    Constraint c = h.andConstraint(c1, c2);
+
+    for (Solution solution : solve(h, c, 5)){
+      assertTrue(solution.isSatisfiable());
+      assertEquals("aabbb", solution.getValue(v));
+    }
+  }
+
+  /**
+   * var v:4;
+     val prefix := v[0:2];
+     val compose := concat("a",prefix,"b",v,"c");
+     assert prefix in "x*";
+     assert compose in "axxbxxppc";
+     //expecting xxpp
+   */
+  public void testSubsequenceAndVarInSameConcat() throws Exception{
+    Hampi h = new Hampi();
+    Expression v = h.varExpr("v");
+    Expression prefix = h.subsequenceExpr(v, 0, 2);
+    Expression compose = h.concatExpr(h.constExpr("a"), prefix, h.constExpr("b"), v, h.constExpr("c"));
+    Regexp r1 = h.starRegexp(h.constRegexp('x'));
+    Constraint c1 = h.regexpConstraint(prefix, true, r1);
+    Constraint c2 = h.regexpConstraint(compose, true, h.constRegexp("axxbxxppc"));
+    Constraint c = h.andConstraint(c1, c2);
+
+    for (Solution solution : solve(h, c, 4)){
+      assertTrue(solution.isSatisfiable());
+      assertEquals("xxpp", solution.getValue(v));
+    }
+  }
+
+  /**
+   * var v:4;
+   * val prefix := v[0:2];
+   * assert prefix in "xx";
+   * //expecting xx??
+   */
+  public void testSubsequenceInConstantRegExp() throws Exception{
+    Hampi h = new Hampi();
+    Expression v = h.varExpr("v");
+    Expression prefix = h.subsequenceExpr(v, 0, 2);
+    Constraint c = h.regexpConstraint(prefix, true, h.constRegexp("xx"));
+
+    for (Solution solution : solve(h, c, 4)){
+      assertTrue(solution.isSatisfiable());
+      assertEquals("xx??", solution.getValue(v));
+    }
+  }
+
+  /**
+   * var v:2;
+   * assert v in "xx";
+   * //expecting xx
+   */
+  public void testVarInConstantRegExp() throws Exception{
+    Hampi h = new Hampi();
+    Expression v = h.varExpr("v");
+    Constraint c = h.regexpConstraint(v, true, h.constRegexp("xx"));
+
+    for (Solution solution : solve(h, c, 2)){
+      assertTrue(solution.isSatisfiable());
+      assertEquals("xx", solution.getValue(v));
+    }
+  }
+
+
 
   public void testMultiConstraints2() throws Exception{
     Hampi h = new Hampi();

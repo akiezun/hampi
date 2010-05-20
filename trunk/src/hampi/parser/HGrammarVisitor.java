@@ -102,4 +102,8 @@ public abstract class HGrammarVisitor{
     //empty
   }
 
+  public void visitSubsequenceExpr(HSubsequenceExpression hSubsequenceExpression){
+    //empty
+  }
+
 }

@@ -93,6 +93,13 @@ public final class Hampi{
   }
 
   /**
+   * Creates a subsequence expression
+   */
+  public Expression subsequenceExpr(Expression expr, int fromIndex, int len){
+    return HampiConstraints.subsequenceExpr(expr, fromIndex, len);
+  }
+
+  /**
    * Creates a conjunction of constraints.
    */
   public Constraint andConstraint(Constraint... constraints){

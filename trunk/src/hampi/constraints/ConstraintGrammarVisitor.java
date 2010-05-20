@@ -70,4 +70,8 @@ public abstract class ConstraintGrammarVisitor{
     //empty
   }
 
+  public void visitSubsequenceExpression(SubsequenceExpression subsequenceExpression){
+    // empty
+  }
+
 }

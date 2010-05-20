@@ -91,6 +91,18 @@ public final class HConstraintPreparer{
       }
       return hampi.concatExpr(exprs);
     }
+    case EXPR_SUBSEQUENCE: {
+      HSubsequenceExpression ce = (HSubsequenceExpression) expression;
+      HStatement decl = ast.getDecl(ce.getName());
+      switch (decl.getKind()){
+      case STMT_VARDECL: {
+        HVarDeclStatement v = (HVarDeclStatement) decl;
+        return hampi.subsequenceExpr(hampi.varExpr(v.getVarName()), ce.getStartIndex(), ce.getLength());
+      }
+      default:
+        throw new IllegalStateException("subsequence can only be used on var declaration " + ce.getName() + " \n" + ast);
+      }
+    }
     case EXPR_VAR: {
       HVarReferenceExpression var = (HVarReferenceExpression) expression;
       return getExpandedExpression(var.getName(), ast);

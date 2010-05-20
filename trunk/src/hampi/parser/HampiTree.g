@@ -271,6 +271,12 @@ expr returns [HExpression e = null] :
    {
      e = cat;
    }
+ )
+ |
+  ^(SUBSEQUENCE id=ID startIndex=INT len=INT
+    {
+      e = new HSubsequenceExpression(id.getText(),startIndex.getText(),len.getText());
+    }
  );
 
 assertStmt returns [HAssertStatement s= null] :

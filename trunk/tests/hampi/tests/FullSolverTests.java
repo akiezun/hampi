@@ -187,7 +187,23 @@ public class FullSolverTests extends TestCase{
   public void testPaperExample() throws Exception{
       doTest(true, Double.MAX_VALUE);
   }
- 
+
+  public void testSubsequence1() throws Exception{
+    doTest(true, Double.MAX_VALUE);
+  }
+
+  public void testSubsequence2() throws Exception{
+    doTest(false, Double.MAX_VALUE);
+  }
+
+  public void testSubsequence3() throws Exception{
+    doTest(true, Double.MAX_VALUE);
+  }
+
+  public void testSubsequence4() throws Exception{
+    doTest(true, Double.MAX_VALUE);
+  }
+
   public void testMinMaxSize1() throws Exception{
     doTest(true, Double.MAX_VALUE);
   }
@@ -195,7 +211,7 @@ public class FullSolverTests extends TestCase{
   public void testMinMaxSize() throws Exception{
     doTest(true, Double.MAX_VALUE);
   }
-  
+
   public void testBoundInference1() throws Exception{
     doTest(true, Double.MAX_VALUE);
   }

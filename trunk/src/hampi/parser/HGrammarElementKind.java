@@ -13,6 +13,7 @@ public enum HGrammarElementKind{
   CFG_STAR,
   CFG_PLUS,
   CFG_TERMINAL,
+  EXPR_SUBSEQUENCE,
   EXPR_CONCAT,
   EXPR_CONST,
   EXPR_VAR,

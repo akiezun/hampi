@@ -1,4 +1,4 @@
-// $ANTLR 3.1b1 src/hampi/parser/HampiTree.g 2009-12-11 22:09:55
+// $ANTLR 3.1b1 src/hampi/parser/HampiTree.g 2010-05-18 12:12:59
 
 package hampi.parser;
 
@@ -10,71 +10,72 @@ import java.util.ArrayList;
 
 public class HampiTree extends TreeParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "CFGPROD", "ASSIGN", "PROGRAM", "CFGOPTION", "CFGSTAR", "CFGPLUS", "FIX", "CONTAINS", "IN", "ASSERT", "CONCAT", "VAR", "CFG", "REG", "VAL", "CONST", "RANGE", "CHARSEQRANGE", "OR", "NOTIN", "NOTCONTAINS", "CFGCHARRANGE", "CFGCHARSEQRANGE", "CFGPRODELEMSET", "VALS", "SEMI", "KW_VAR", "ID", "COLON", "INT", "KW_CFG", "BAR", "LPAREN", "RPAREN", "QUESTION", "STAR", "PLUS", "LSQUARE", "CHAR_LIT", "MINUS", "RSQUARE", "CHAR_SEQ", "STR_LIT", "KW_REG", "KW_FIX", "COMMA", "KW_STAR", "KW_OR", "KW_CONCAT", "KW_VAL", "KW_ASSERT", "KW_IN", "KW_CONTAINS", "KW_NOT", "KW_QUERY", "EQUALS", "EscapeSequence", "NEWLINE", "WS", "COMMENT", "LINE_COMMENT", "'..'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "CFGPROD", "ASSIGN", "PROGRAM", "CFGOPTION", "CFGSTAR", "CFGPLUS", "FIX", "CONTAINS", "IN", "ASSERT", "CONCAT", "SUBSEQUENCE", "VAR", "CFG", "REG", "VAL", "CONST", "RANGE", "CHARSEQRANGE", "OR", "NOTIN", "NOTCONTAINS", "CFGCHARRANGE", "CFGCHARSEQRANGE", "CFGPRODELEMSET", "VALS", "SEMI", "KW_VAR", "ID", "COLON", "INT", "KW_CFG", "BAR", "LPAREN", "RPAREN", "QUESTION", "STAR", "PLUS", "LSQUARE", "CHAR_LIT", "MINUS", "RSQUARE", "CHAR_SEQ", "STR_LIT", "KW_REG", "KW_FIX", "COMMA", "KW_STAR", "KW_OR", "KW_CONCAT", "KW_VAL", "KW_ASSERT", "KW_IN", "KW_CONTAINS", "KW_NOT", "KW_QUERY", "EQUALS", "EscapeSequence", "NEWLINE", "WS", "COMMENT", "LINE_COMMENT", "'..'"
     };
+    public static final int T__66=66;
     public static final int CFGSTAR=8;
     public static final int FIX=10;
-    public static final int STAR=39;
-    public static final int LSQUARE=41;
-    public static final int T__65=65;
-    public static final int KW_VAL=53;
-    public static final int CONST=19;
+    public static final int STAR=40;
+    public static final int LSQUARE=42;
+    public static final int KW_VAL=54;
+    public static final int CONST=20;
     public static final int CFGPROD=4;
     public static final int CONTAINS=11;
-    public static final int EQUALS=59;
-    public static final int ID=31;
-    public static final int CFG=16;
+    public static final int EQUALS=60;
+    public static final int ID=32;
+    public static final int CFG=17;
     public static final int EOF=-1;
-    public static final int LPAREN=36;
-    public static final int KW_VAR=30;
-    public static final int VALS=28;
-    public static final int CHAR_SEQ=45;
-    public static final int RPAREN=37;
+    public static final int LPAREN=37;
+    public static final int KW_VAR=31;
+    public static final int VALS=29;
+    public static final int CHAR_SEQ=46;
+    public static final int RPAREN=38;
     public static final int IN=12;
     public static final int CFGOPTION=7;
-    public static final int COMMA=49;
-    public static final int CFGPRODELEMSET=27;
-    public static final int CFGCHARRANGE=25;
-    public static final int KW_IN=55;
-    public static final int VAL=18;
-    public static final int PLUS=40;
-    public static final int VAR=15;
-    public static final int COMMENT=63;
-    public static final int NOTCONTAINS=24;
-    public static final int KW_FIX=48;
-    public static final int KW_REG=47;
-    public static final int LINE_COMMENT=64;
+    public static final int COMMA=50;
+    public static final int CFGPRODELEMSET=28;
+    public static final int CFGCHARRANGE=26;
+    public static final int KW_IN=56;
+    public static final int VAL=19;
+    public static final int PLUS=41;
+    public static final int VAR=16;
+    public static final int COMMENT=64;
+    public static final int NOTCONTAINS=25;
+    public static final int KW_FIX=49;
+    public static final int KW_REG=48;
+    public static final int LINE_COMMENT=65;
     public static final int CONCAT=14;
-    public static final int KW_ASSERT=54;
-    public static final int STR_LIT=46;
-    public static final int KW_QUERY=58;
-    public static final int RANGE=20;
-    public static final int INT=33;
-    public static final int CHAR_LIT=42;
-    public static final int RSQUARE=44;
-    public static final int MINUS=43;
-    public static final int REG=17;
-    public static final int SEMI=29;
+    public static final int KW_ASSERT=55;
+    public static final int STR_LIT=47;
+    public static final int KW_QUERY=59;
+    public static final int RANGE=21;
+    public static final int SUBSEQUENCE=15;
+    public static final int INT=34;
+    public static final int CHAR_LIT=43;
+    public static final int MINUS=44;
+    public static final int RSQUARE=45;
+    public static final int REG=18;
+    public static final int SEMI=30;
     public static final int ASSERT=13;
-    public static final int CFGCHARSEQRANGE=26;
+    public static final int CFGCHARSEQRANGE=27;
     public static final int CFGPLUS=9;
-    public static final int COLON=32;
-    public static final int WS=62;
-    public static final int QUESTION=38;
-    public static final int KW_CONCAT=52;
-    public static final int NEWLINE=61;
-    public static final int KW_OR=51;
-    public static final int KW_CONTAINS=56;
-    public static final int OR=22;
-    public static final int CHARSEQRANGE=21;
+    public static final int COLON=33;
+    public static final int WS=63;
+    public static final int QUESTION=39;
+    public static final int KW_CONCAT=53;
+    public static final int NEWLINE=62;
+    public static final int KW_OR=52;
+    public static final int KW_CONTAINS=57;
+    public static final int OR=23;
+    public static final int CHARSEQRANGE=22;
     public static final int ASSIGN=5;
     public static final int PROGRAM=6;
-    public static final int KW_STAR=50;
-    public static final int EscapeSequence=60;
-    public static final int BAR=35;
-    public static final int KW_CFG=34;
-    public static final int KW_NOT=57;
-    public static final int NOTIN=23;
+    public static final int KW_STAR=51;
+    public static final int EscapeSequence=61;
+    public static final int BAR=36;
+    public static final int KW_CFG=35;
+    public static final int KW_NOT=58;
+    public static final int NOTIN=24;
 
     // delegates
     // delegators
@@ -1730,18 +1731,20 @@ public class HampiTree extends TreeParser {
 
 
     // $ANTLR start expr
-    // src/hampi/parser/HampiTree.g:248:1: expr returns [HExpression e = null] : ( (s= STR_LIT ) | (id= ID ) | ^( CONCAT (sube= expr )+ ) );
+    // src/hampi/parser/HampiTree.g:248:1: expr returns [HExpression e = null] : ( (s= STR_LIT ) | (id= ID ) | ^( CONCAT (sube= expr )+ ) | ^( SUBSEQUENCE id= ID startIndex= INT len= INT ) );
     public final HExpression expr() throws RecognitionException {
         HExpression e =  null;
 
         CommonTree s=null;
         CommonTree id=null;
+        CommonTree startIndex=null;
+        CommonTree len=null;
         HExpression sube = null;
 
 
         try {
-            // src/hampi/parser/HampiTree.g:248:37: ( (s= STR_LIT ) | (id= ID ) | ^( CONCAT (sube= expr )+ ) )
-            int alt12=3;
+            // src/hampi/parser/HampiTree.g:248:37: ( (s= STR_LIT ) | (id= ID ) | ^( CONCAT (sube= expr )+ ) | ^( SUBSEQUENCE id= ID startIndex= INT len= INT ) )
+            int alt12=4;
             switch ( input.LA(1) ) {
             case STR_LIT:
                 {
@@ -1756,6 +1759,11 @@ public class HampiTree extends TreeParser {
             case CONCAT:
                 {
                 alt12=3;
+                }
+                break;
+            case SUBSEQUENCE:
+                {
+                alt12=4;
                 }
                 break;
             default:
@@ -1815,7 +1823,7 @@ public class HampiTree extends TreeParser {
                         int alt11=2;
                         int LA11_0 = input.LA(1);
 
-                        if ( (LA11_0==CONCAT||LA11_0==ID||LA11_0==STR_LIT) ) {
+                        if ( ((LA11_0>=CONCAT && LA11_0<=SUBSEQUENCE)||LA11_0==ID||LA11_0==STR_LIT) ) {
                             alt11=1;
                         }
 
@@ -1853,6 +1861,23 @@ public class HampiTree extends TreeParser {
 
                     }
                     break;
+                case 4 :
+                    // src/hampi/parser/HampiTree.g:276:3: ^( SUBSEQUENCE id= ID startIndex= INT len= INT )
+                    {
+                    match(input,SUBSEQUENCE,FOLLOW_SUBSEQUENCE_in_expr1429); 
+
+                    match(input, Token.DOWN, null); 
+                    id=(CommonTree)match(input,ID,FOLLOW_ID_in_expr1433); 
+                    startIndex=(CommonTree)match(input,INT,FOLLOW_INT_in_expr1437); 
+                    len=(CommonTree)match(input,INT,FOLLOW_INT_in_expr1441); 
+
+                          e = new HSubsequenceExpression(id.getText(),startIndex.getText(),len.getText());
+                        
+
+                    match(input, Token.UP, null); 
+
+                    }
+                    break;
 
             }
         }
@@ -1868,7 +1893,7 @@ public class HampiTree extends TreeParser {
 
 
     // $ANTLR start assertStmt
-    // src/hampi/parser/HampiTree.g:276:1: assertStmt returns [HAssertStatement s= null] : ^( ASSERT b= boolExpr ) ;
+    // src/hampi/parser/HampiTree.g:282:1: assertStmt returns [HAssertStatement s= null] : ^( ASSERT b= boolExpr ) ;
     public final HAssertStatement assertStmt() throws RecognitionException {
         HAssertStatement s =  null;
 
@@ -1876,13 +1901,13 @@ public class HampiTree extends TreeParser {
 
 
         try {
-            // src/hampi/parser/HampiTree.g:276:47: ( ^( ASSERT b= boolExpr ) )
-            // src/hampi/parser/HampiTree.g:277:2: ^( ASSERT b= boolExpr )
+            // src/hampi/parser/HampiTree.g:282:47: ( ^( ASSERT b= boolExpr ) )
+            // src/hampi/parser/HampiTree.g:283:2: ^( ASSERT b= boolExpr )
             {
-            match(input,ASSERT,FOLLOW_ASSERT_in_assertStmt1435); 
+            match(input,ASSERT,FOLLOW_ASSERT_in_assertStmt1464); 
 
             match(input, Token.DOWN, null); 
-            pushFollow(FOLLOW_boolExpr_in_assertStmt1439);
+            pushFollow(FOLLOW_boolExpr_in_assertStmt1468);
             b=boolExpr();
 
             state._fsp--;
@@ -1908,7 +1933,7 @@ public class HampiTree extends TreeParser {
 
 
     // $ANTLR start boolExpr
-    // src/hampi/parser/HampiTree.g:284:1: boolExpr returns [HBooleanExpression b = null] : ( ^( IN id1= ID id2= ID ) | ^( CONTAINS id= ID str= STR_LIT ) | ^( NOTIN id1= ID id2= ID ) | ^( NOTCONTAINS id= ID str= STR_LIT ) );
+    // src/hampi/parser/HampiTree.g:290:1: boolExpr returns [HBooleanExpression b = null] : ( ^( IN id1= ID id2= ID ) | ^( CONTAINS id= ID str= STR_LIT ) | ^( NOTIN id1= ID id2= ID ) | ^( NOTCONTAINS id= ID str= STR_LIT ) );
     public final HBooleanExpression boolExpr() throws RecognitionException {
         HBooleanExpression b =  null;
 
@@ -1918,7 +1943,7 @@ public class HampiTree extends TreeParser {
         CommonTree str=null;
 
         try {
-            // src/hampi/parser/HampiTree.g:284:48: ( ^( IN id1= ID id2= ID ) | ^( CONTAINS id= ID str= STR_LIT ) | ^( NOTIN id1= ID id2= ID ) | ^( NOTCONTAINS id= ID str= STR_LIT ) )
+            // src/hampi/parser/HampiTree.g:290:48: ( ^( IN id1= ID id2= ID ) | ^( CONTAINS id= ID str= STR_LIT ) | ^( NOTIN id1= ID id2= ID ) | ^( NOTCONTAINS id= ID str= STR_LIT ) )
             int alt13=4;
             switch ( input.LA(1) ) {
             case IN:
@@ -1950,13 +1975,13 @@ public class HampiTree extends TreeParser {
 
             switch (alt13) {
                 case 1 :
-                    // src/hampi/parser/HampiTree.g:285:5: ^( IN id1= ID id2= ID )
+                    // src/hampi/parser/HampiTree.g:291:5: ^( IN id1= ID id2= ID )
                     {
-                    match(input,IN,FOLLOW_IN_in_boolExpr1467); 
+                    match(input,IN,FOLLOW_IN_in_boolExpr1496); 
 
                     match(input, Token.DOWN, null); 
-                    id1=(CommonTree)match(input,ID,FOLLOW_ID_in_boolExpr1471); 
-                    id2=(CommonTree)match(input,ID,FOLLOW_ID_in_boolExpr1475); 
+                    id1=(CommonTree)match(input,ID,FOLLOW_ID_in_boolExpr1500); 
+                    id2=(CommonTree)match(input,ID,FOLLOW_ID_in_boolExpr1504); 
 
                           b = new HInExpression(id1.getText(), id2.getText(), true);
                         
@@ -1966,13 +1991,13 @@ public class HampiTree extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // src/hampi/parser/HampiTree.g:290:5: ^( CONTAINS id= ID str= STR_LIT )
+                    // src/hampi/parser/HampiTree.g:296:5: ^( CONTAINS id= ID str= STR_LIT )
                     {
-                    match(input,CONTAINS,FOLLOW_CONTAINS_in_boolExpr1494); 
+                    match(input,CONTAINS,FOLLOW_CONTAINS_in_boolExpr1523); 
 
                     match(input, Token.DOWN, null); 
-                    id=(CommonTree)match(input,ID,FOLLOW_ID_in_boolExpr1498); 
-                    str=(CommonTree)match(input,STR_LIT,FOLLOW_STR_LIT_in_boolExpr1502); 
+                    id=(CommonTree)match(input,ID,FOLLOW_ID_in_boolExpr1527); 
+                    str=(CommonTree)match(input,STR_LIT,FOLLOW_STR_LIT_in_boolExpr1531); 
 
                           b = new HContainsExpression(id.getText(), str.getText(), true);
                       
@@ -1982,13 +2007,13 @@ public class HampiTree extends TreeParser {
                     }
                     break;
                 case 3 :
-                    // src/hampi/parser/HampiTree.g:296:5: ^( NOTIN id1= ID id2= ID )
+                    // src/hampi/parser/HampiTree.g:302:5: ^( NOTIN id1= ID id2= ID )
                     {
-                    match(input,NOTIN,FOLLOW_NOTIN_in_boolExpr1521); 
+                    match(input,NOTIN,FOLLOW_NOTIN_in_boolExpr1550); 
 
                     match(input, Token.DOWN, null); 
-                    id1=(CommonTree)match(input,ID,FOLLOW_ID_in_boolExpr1525); 
-                    id2=(CommonTree)match(input,ID,FOLLOW_ID_in_boolExpr1529); 
+                    id1=(CommonTree)match(input,ID,FOLLOW_ID_in_boolExpr1554); 
+                    id2=(CommonTree)match(input,ID,FOLLOW_ID_in_boolExpr1558); 
 
                           b = new HInExpression(id1.getText(), id2.getText(), false);
                         
@@ -1998,13 +2023,13 @@ public class HampiTree extends TreeParser {
                     }
                     break;
                 case 4 :
-                    // src/hampi/parser/HampiTree.g:301:5: ^( NOTCONTAINS id= ID str= STR_LIT )
+                    // src/hampi/parser/HampiTree.g:307:5: ^( NOTCONTAINS id= ID str= STR_LIT )
                     {
-                    match(input,NOTCONTAINS,FOLLOW_NOTCONTAINS_in_boolExpr1548); 
+                    match(input,NOTCONTAINS,FOLLOW_NOTCONTAINS_in_boolExpr1577); 
 
                     match(input, Token.DOWN, null); 
-                    id=(CommonTree)match(input,ID,FOLLOW_ID_in_boolExpr1552); 
-                    str=(CommonTree)match(input,STR_LIT,FOLLOW_STR_LIT_in_boolExpr1556); 
+                    id=(CommonTree)match(input,ID,FOLLOW_ID_in_boolExpr1581); 
+                    str=(CommonTree)match(input,STR_LIT,FOLLOW_STR_LIT_in_boolExpr1585); 
 
                           b = new HContainsExpression(id.getText(), str.getText(), false);
                       
@@ -2032,25 +2057,25 @@ public class HampiTree extends TreeParser {
  
 
     public static final BitSet FOLLOW_PROGRAM_in_program56 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_statement_in_program72 = new BitSet(new long[]{0x000000000007A008L});
+    public static final BitSet FOLLOW_statement_in_program72 = new BitSet(new long[]{0x00000000000F2008L});
     public static final BitSet FOLLOW_vardeclStmt_in_statement151 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_cfgStmt_in_statement174 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_regStmt_in_statement198 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_valDeclStmt_in_statement222 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_assertStmt_in_statement245 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_VAR_in_vardeclStmt289 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_vardeclStmt293 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_ID_in_vardeclStmt293 = new BitSet(new long[]{0x0000000400000000L});
     public static final BitSet FOLLOW_INT_in_vardeclStmt303 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_VAR_in_vardeclStmt339 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_vardeclStmt343 = new BitSet(new long[]{0x0000000200000000L});
-    public static final BitSet FOLLOW_INT_in_vardeclStmt355 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_ID_in_vardeclStmt343 = new BitSet(new long[]{0x0000000400000000L});
+    public static final BitSet FOLLOW_INT_in_vardeclStmt355 = new BitSet(new long[]{0x0000000400000000L});
     public static final BitSet FOLLOW_INT_in_vardeclStmt367 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_CFG_in_cfgStmt407 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_CFGPROD_in_cfgStmt413 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_cfgStmt417 = new BitSet(new long[]{0x0000000008000000L});
-    public static final BitSet FOLLOW_cfgProductionElementSet_in_cfgStmt433 = new BitSet(new long[]{0x0000000008000008L});
+    public static final BitSet FOLLOW_ID_in_cfgStmt417 = new BitSet(new long[]{0x0000000010000000L});
+    public static final BitSet FOLLOW_cfgProductionElementSet_in_cfgStmt433 = new BitSet(new long[]{0x0000000010000008L});
     public static final BitSet FOLLOW_CFGPRODELEMSET_in_cfgProductionElementSet463 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_cfgProdElement_in_cfgProductionElementSet472 = new BitSet(new long[]{0x0000600086000388L});
+    public static final BitSet FOLLOW_cfgProdElement_in_cfgProductionElementSet472 = new BitSet(new long[]{0x0000C0010C000388L});
     public static final BitSet FOLLOW_cfgTerminal_in_cfgProdElement499 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_cfgNonterminal_in_cfgProdElement509 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_cfgOption_in_cfgProdElement519 = new BitSet(new long[]{0x0000000000000002L});
@@ -2068,13 +2093,13 @@ public class HampiTree extends TreeParser {
     public static final BitSet FOLLOW_CFGPLUS_in_cfgPlus708 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_cfgProdElement_in_cfgPlus716 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_CFGCHARRANGE_in_cfgCharRange738 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_CHAR_LIT_in_cfgCharRange745 = new BitSet(new long[]{0x0000040000000000L});
+    public static final BitSet FOLLOW_CHAR_LIT_in_cfgCharRange745 = new BitSet(new long[]{0x0000080000000000L});
     public static final BitSet FOLLOW_CHAR_LIT_in_cfgCharRange752 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_CFGCHARSEQRANGE_in_cfgCharSeqRange773 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_CHAR_SEQ_in_cfgCharSeqRange780 = new BitSet(new long[]{0x0000200000000000L});
+    public static final BitSet FOLLOW_CHAR_SEQ_in_cfgCharSeqRange780 = new BitSet(new long[]{0x0000400000000000L});
     public static final BitSet FOLLOW_CHAR_SEQ_in_cfgCharSeqRange787 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_REG_in_regStmt809 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_regStmt813 = new BitSet(new long[]{0x0000608080704400L});
+    public static final BitSet FOLLOW_ID_in_regStmt813 = new BitSet(new long[]{0x0000C10100E04400L});
     public static final BitSet FOLLOW_regDefinition_in_regStmt824 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_regConst_in_regDefinition853 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_regCharSeqConst_in_regDefinition869 = new BitSet(new long[]{0x0000000000000002L});
@@ -2087,42 +2112,46 @@ public class HampiTree extends TreeParser {
     public static final BitSet FOLLOW_regConcat_in_regDefinition960 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ID_in_regVarRef982 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_OR_in_regOr1000 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_regDefinition_in_regOr1014 = new BitSet(new long[]{0x0000608080704408L});
+    public static final BitSet FOLLOW_regDefinition_in_regOr1014 = new BitSet(new long[]{0x0000C10100E04408L});
     public static final BitSet FOLLOW_CONCAT_in_regConcat1042 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_regDefinition_in_regConcat1056 = new BitSet(new long[]{0x0000608080704408L});
+    public static final BitSet FOLLOW_regDefinition_in_regConcat1056 = new BitSet(new long[]{0x0000C10100E04408L});
     public static final BitSet FOLLOW_RANGE_in_regRange1085 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_CHAR_LIT_in_regRange1089 = new BitSet(new long[]{0x0000040000000000L});
+    public static final BitSet FOLLOW_CHAR_LIT_in_regRange1089 = new BitSet(new long[]{0x0000080000000000L});
     public static final BitSet FOLLOW_CHAR_LIT_in_regRange1103 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_CHARSEQRANGE_in_regSeqRange1140 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_CHAR_SEQ_in_regSeqRange1144 = new BitSet(new long[]{0x0000200000000000L});
+    public static final BitSet FOLLOW_CHAR_SEQ_in_regSeqRange1144 = new BitSet(new long[]{0x0000400000000000L});
     public static final BitSet FOLLOW_CHAR_SEQ_in_regSeqRange1157 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_STAR_in_regStar1193 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_regDefinition_in_regStar1197 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_STR_LIT_in_regConst1220 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_CHAR_SEQ_in_regCharSeqConst1243 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_FIX_in_cfgSizeFix1266 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_cfgSizeFix1277 = new BitSet(new long[]{0x0000000200000000L});
+    public static final BitSet FOLLOW_ID_in_cfgSizeFix1277 = new BitSet(new long[]{0x0000000400000000L});
     public static final BitSet FOLLOW_INT_in_cfgSizeFix1287 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_VAL_in_valDeclStmt1313 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_valDeclStmt1320 = new BitSet(new long[]{0x0000400080004000L});
+    public static final BitSet FOLLOW_ID_in_valDeclStmt1320 = new BitSet(new long[]{0x000080010000C000L});
     public static final BitSet FOLLOW_expr_in_valDeclStmt1326 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_STR_LIT_in_expr1352 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ID_in_expr1368 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_CONCAT_in_expr1383 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expr_in_expr1398 = new BitSet(new long[]{0x0000400080004008L});
-    public static final BitSet FOLLOW_ASSERT_in_assertStmt1435 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_boolExpr_in_assertStmt1439 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_IN_in_boolExpr1467 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_boolExpr1471 = new BitSet(new long[]{0x0000000080000000L});
-    public static final BitSet FOLLOW_ID_in_boolExpr1475 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_CONTAINS_in_boolExpr1494 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_boolExpr1498 = new BitSet(new long[]{0x0000400000000000L});
-    public static final BitSet FOLLOW_STR_LIT_in_boolExpr1502 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_NOTIN_in_boolExpr1521 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_boolExpr1525 = new BitSet(new long[]{0x0000000080000000L});
-    public static final BitSet FOLLOW_ID_in_boolExpr1529 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_NOTCONTAINS_in_boolExpr1548 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_ID_in_boolExpr1552 = new BitSet(new long[]{0x0000400000000000L});
-    public static final BitSet FOLLOW_STR_LIT_in_boolExpr1556 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_expr_in_expr1398 = new BitSet(new long[]{0x000080010000C008L});
+    public static final BitSet FOLLOW_SUBSEQUENCE_in_expr1429 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_expr1433 = new BitSet(new long[]{0x0000000400000000L});
+    public static final BitSet FOLLOW_INT_in_expr1437 = new BitSet(new long[]{0x0000000400000000L});
+    public static final BitSet FOLLOW_INT_in_expr1441 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ASSERT_in_assertStmt1464 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_boolExpr_in_assertStmt1468 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_IN_in_boolExpr1496 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_boolExpr1500 = new BitSet(new long[]{0x0000000100000000L});
+    public static final BitSet FOLLOW_ID_in_boolExpr1504 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_CONTAINS_in_boolExpr1523 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_boolExpr1527 = new BitSet(new long[]{0x0000800000000000L});
+    public static final BitSet FOLLOW_STR_LIT_in_boolExpr1531 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_NOTIN_in_boolExpr1550 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_boolExpr1554 = new BitSet(new long[]{0x0000000100000000L});
+    public static final BitSet FOLLOW_ID_in_boolExpr1558 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_NOTCONTAINS_in_boolExpr1577 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ID_in_boolExpr1581 = new BitSet(new long[]{0x0000800000000000L});
+    public static final BitSet FOLLOW_STR_LIT_in_boolExpr1585 = new BitSet(new long[]{0x0000000000000008L});
 
 }
