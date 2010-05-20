@@ -121,4 +121,8 @@ public final class ASCIITable{
     }
     return result;
   }
+
+  public static boolean isReadable(char c){
+    return c > 31 && c < 255;
+  }
 }
