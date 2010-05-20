@@ -68,7 +68,12 @@ public final class CharacterEncoding{
       String s = str.substring(letterEncodingLength * i, letterEncodingLength * (i + 1));
       assert s.length() == letterEncodingLength : "incorrect substring " + s;
       int val = Integer.parseInt(s, isBinary ? 2 : 16);
-      b.append(decodeInt(val));
+      char decodeInt = decodeInt(val);
+      if (ASCIITable.isReadable(decodeInt)){
+        b.append(decodeInt);
+      }else{
+        b.append("?");
+      }
     }
     return b.toString();
   }

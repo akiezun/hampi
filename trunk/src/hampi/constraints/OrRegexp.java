@@ -63,9 +63,9 @@ public final class OrRegexp extends Regexp{
       StringBuilder b = new StringBuilder();
       b.append("[");
       for (Pair<Character, Character> range : getCharacterRanges()){
-        b.append(range.first);
+        b.append(ASCIITable.isReadable(range.first) ? range.first : "C" + (int) range.first);
         b.append("-");
-        b.append(range.second);
+        b.append(ASCIITable.isReadable(range.second) ? range.second : "C" + (int) range.second);
       }
       b.append("]");
       return b.toString();
