@@ -1,4 +1,4 @@
-// $ANTLR 3.1b1 src/hampi/parser/Hampi.g 2009-12-11 22:09:50
+// $ANTLR 3.1b1 src/hampi/parser/Hampi.g 2010-05-18 12:13:01
  
      package hampi.parser; 
    
@@ -9,69 +9,70 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class HampiLexer extends Lexer {
+    public static final int T__66=66;
     public static final int CFGSTAR=8;
     public static final int FIX=10;
-    public static final int STAR=39;
-    public static final int LSQUARE=41;
-    public static final int T__65=65;
-    public static final int KW_VAL=53;
-    public static final int CONST=19;
+    public static final int STAR=40;
+    public static final int LSQUARE=42;
+    public static final int KW_VAL=54;
+    public static final int CONST=20;
     public static final int CFGPROD=4;
     public static final int CONTAINS=11;
-    public static final int EQUALS=59;
-    public static final int ID=31;
-    public static final int CFG=16;
+    public static final int EQUALS=60;
+    public static final int ID=32;
+    public static final int CFG=17;
     public static final int EOF=-1;
-    public static final int LPAREN=36;
-    public static final int KW_VAR=30;
-    public static final int VALS=28;
-    public static final int CHAR_SEQ=45;
-    public static final int RPAREN=37;
+    public static final int LPAREN=37;
+    public static final int KW_VAR=31;
+    public static final int VALS=29;
+    public static final int CHAR_SEQ=46;
+    public static final int RPAREN=38;
     public static final int IN=12;
     public static final int CFGOPTION=7;
-    public static final int COMMA=49;
-    public static final int CFGPRODELEMSET=27;
-    public static final int CFGCHARRANGE=25;
-    public static final int KW_IN=55;
-    public static final int VAL=18;
-    public static final int PLUS=40;
-    public static final int VAR=15;
-    public static final int COMMENT=63;
-    public static final int NOTCONTAINS=24;
-    public static final int KW_FIX=48;
-    public static final int KW_REG=47;
-    public static final int LINE_COMMENT=64;
+    public static final int COMMA=50;
+    public static final int CFGPRODELEMSET=28;
+    public static final int CFGCHARRANGE=26;
+    public static final int KW_IN=56;
+    public static final int VAL=19;
+    public static final int PLUS=41;
+    public static final int VAR=16;
+    public static final int COMMENT=64;
+    public static final int NOTCONTAINS=25;
+    public static final int KW_FIX=49;
+    public static final int KW_REG=48;
+    public static final int LINE_COMMENT=65;
     public static final int CONCAT=14;
-    public static final int KW_ASSERT=54;
-    public static final int STR_LIT=46;
-    public static final int KW_QUERY=58;
-    public static final int RANGE=20;
-    public static final int INT=33;
-    public static final int CHAR_LIT=42;
-    public static final int RSQUARE=44;
-    public static final int MINUS=43;
-    public static final int REG=17;
-    public static final int SEMI=29;
+    public static final int KW_ASSERT=55;
+    public static final int STR_LIT=47;
+    public static final int KW_QUERY=59;
+    public static final int RANGE=21;
+    public static final int SUBSEQUENCE=15;
+    public static final int INT=34;
+    public static final int CHAR_LIT=43;
+    public static final int MINUS=44;
+    public static final int RSQUARE=45;
+    public static final int REG=18;
+    public static final int SEMI=30;
     public static final int ASSERT=13;
-    public static final int CFGCHARSEQRANGE=26;
+    public static final int CFGCHARSEQRANGE=27;
     public static final int CFGPLUS=9;
-    public static final int COLON=32;
-    public static final int WS=62;
-    public static final int QUESTION=38;
-    public static final int KW_CONCAT=52;
-    public static final int NEWLINE=61;
-    public static final int KW_OR=51;
-    public static final int KW_CONTAINS=56;
-    public static final int OR=22;
-    public static final int CHARSEQRANGE=21;
+    public static final int COLON=33;
+    public static final int WS=63;
+    public static final int QUESTION=39;
+    public static final int KW_CONCAT=53;
+    public static final int NEWLINE=62;
+    public static final int KW_OR=52;
+    public static final int KW_CONTAINS=57;
+    public static final int OR=23;
+    public static final int CHARSEQRANGE=22;
     public static final int ASSIGN=5;
     public static final int PROGRAM=6;
-    public static final int KW_STAR=50;
-    public static final int EscapeSequence=60;
-    public static final int BAR=35;
-    public static final int KW_CFG=34;
-    public static final int KW_NOT=57;
-    public static final int NOTIN=23;
+    public static final int KW_STAR=51;
+    public static final int EscapeSequence=61;
+    public static final int BAR=36;
+    public static final int KW_CFG=35;
+    public static final int KW_NOT=58;
+    public static final int NOTIN=24;
 
     // delegates
     // delegators
@@ -86,10 +87,10 @@ public class HampiLexer extends Lexer {
     }
     public String getGrammarFileName() { return "src/hampi/parser/Hampi.g"; }
 
-    // $ANTLR start T__65
-    public final void mT__65() throws RecognitionException {
+    // $ANTLR start T__66
+    public final void mT__66() throws RecognitionException {
         try {
-            int _type = T__65;
+            int _type = T__66;
             int _channel = DEFAULT_TOKEN_CHANNEL;
             // src/hampi/parser/Hampi.g:7:7: ( '..' )
             // src/hampi/parser/Hampi.g:7:9: '..'
@@ -105,15 +106,15 @@ public class HampiLexer extends Lexer {
         finally {
         }
     }
-    // $ANTLR end T__65
+    // $ANTLR end T__66
 
     // $ANTLR start KW_VAR
     public final void mKW_VAR() throws RecognitionException {
         try {
             int _type = KW_VAR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:111:8: ( 'var' )
-            // src/hampi/parser/Hampi.g:111:10: 'var'
+            // src/hampi/parser/Hampi.g:113:8: ( 'var' )
+            // src/hampi/parser/Hampi.g:113:10: 'var'
             {
             match("var"); 
 
@@ -133,8 +134,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = KW_CONCAT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:112:11: ( 'concat' )
-            // src/hampi/parser/Hampi.g:112:13: 'concat'
+            // src/hampi/parser/Hampi.g:114:11: ( 'concat' )
+            // src/hampi/parser/Hampi.g:114:13: 'concat'
             {
             match("concat"); 
 
@@ -154,8 +155,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = KW_CFG;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:113:8: ( 'cfg' )
-            // src/hampi/parser/Hampi.g:113:10: 'cfg'
+            // src/hampi/parser/Hampi.g:115:8: ( 'cfg' )
+            // src/hampi/parser/Hampi.g:115:10: 'cfg'
             {
             match("cfg"); 
 
@@ -175,8 +176,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = KW_VAL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:114:8: ( 'val' )
-            // src/hampi/parser/Hampi.g:114:10: 'val'
+            // src/hampi/parser/Hampi.g:116:8: ( 'val' )
+            // src/hampi/parser/Hampi.g:116:10: 'val'
             {
             match("val"); 
 
@@ -196,8 +197,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = KW_REG;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:115:8: ( 'reg' )
-            // src/hampi/parser/Hampi.g:115:10: 'reg'
+            // src/hampi/parser/Hampi.g:117:8: ( 'reg' )
+            // src/hampi/parser/Hampi.g:117:10: 'reg'
             {
             match("reg"); 
 
@@ -217,8 +218,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = KW_QUERY;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:116:9: ( 'query' )
-            // src/hampi/parser/Hampi.g:116:11: 'query'
+            // src/hampi/parser/Hampi.g:118:9: ( 'query' )
+            // src/hampi/parser/Hampi.g:118:11: 'query'
             {
             match("query"); 
 
@@ -238,8 +239,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = KW_FIX;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:117:8: ( 'fix' )
-            // src/hampi/parser/Hampi.g:117:10: 'fix'
+            // src/hampi/parser/Hampi.g:119:8: ( 'fix' )
+            // src/hampi/parser/Hampi.g:119:10: 'fix'
             {
             match("fix"); 
 
@@ -259,8 +260,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = KW_ASSERT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:118:11: ( 'assert' )
-            // src/hampi/parser/Hampi.g:118:13: 'assert'
+            // src/hampi/parser/Hampi.g:120:11: ( 'assert' )
+            // src/hampi/parser/Hampi.g:120:13: 'assert'
             {
             match("assert"); 
 
@@ -280,8 +281,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = KW_CONTAINS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:119:13: ( 'contains' )
-            // src/hampi/parser/Hampi.g:119:15: 'contains'
+            // src/hampi/parser/Hampi.g:121:13: ( 'contains' )
+            // src/hampi/parser/Hampi.g:121:15: 'contains'
             {
             match("contains"); 
 
@@ -301,8 +302,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = KW_IN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:120:7: ( 'in' )
-            // src/hampi/parser/Hampi.g:120:9: 'in'
+            // src/hampi/parser/Hampi.g:122:7: ( 'in' )
+            // src/hampi/parser/Hampi.g:122:9: 'in'
             {
             match("in"); 
 
@@ -322,8 +323,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = KW_STAR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:121:9: ( 'star' )
-            // src/hampi/parser/Hampi.g:121:11: 'star'
+            // src/hampi/parser/Hampi.g:123:9: ( 'star' )
+            // src/hampi/parser/Hampi.g:123:11: 'star'
             {
             match("star"); 
 
@@ -343,8 +344,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = KW_OR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:122:7: ( 'or' )
-            // src/hampi/parser/Hampi.g:122:9: 'or'
+            // src/hampi/parser/Hampi.g:124:7: ( 'or' )
+            // src/hampi/parser/Hampi.g:124:9: 'or'
             {
             match("or"); 
 
@@ -364,8 +365,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = KW_NOT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:123:8: ( 'not' )
-            // src/hampi/parser/Hampi.g:123:10: 'not'
+            // src/hampi/parser/Hampi.g:125:8: ( 'not' )
+            // src/hampi/parser/Hampi.g:125:10: 'not'
             {
             match("not"); 
 
@@ -385,8 +386,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = LPAREN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:126:8: ( '(' )
-            // src/hampi/parser/Hampi.g:126:10: '('
+            // src/hampi/parser/Hampi.g:128:8: ( '(' )
+            // src/hampi/parser/Hampi.g:128:10: '('
             {
             match('('); 
 
@@ -405,8 +406,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = RPAREN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:127:8: ( ')' )
-            // src/hampi/parser/Hampi.g:127:10: ')'
+            // src/hampi/parser/Hampi.g:129:8: ( ')' )
+            // src/hampi/parser/Hampi.g:129:10: ')'
             {
             match(')'); 
 
@@ -425,8 +426,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = LSQUARE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:128:9: ( '[' )
-            // src/hampi/parser/Hampi.g:128:11: '['
+            // src/hampi/parser/Hampi.g:130:9: ( '[' )
+            // src/hampi/parser/Hampi.g:130:11: '['
             {
             match('['); 
 
@@ -445,8 +446,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = RSQUARE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:129:9: ( ']' )
-            // src/hampi/parser/Hampi.g:129:11: ']'
+            // src/hampi/parser/Hampi.g:131:9: ( ']' )
+            // src/hampi/parser/Hampi.g:131:11: ']'
             {
             match(']'); 
 
@@ -465,8 +466,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = COMMA;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:130:7: ( ',' )
-            // src/hampi/parser/Hampi.g:130:9: ','
+            // src/hampi/parser/Hampi.g:132:7: ( ',' )
+            // src/hampi/parser/Hampi.g:132:9: ','
             {
             match(','); 
 
@@ -485,8 +486,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = EQUALS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:131:8: ( '=' )
-            // src/hampi/parser/Hampi.g:131:10: '='
+            // src/hampi/parser/Hampi.g:133:8: ( '=' )
+            // src/hampi/parser/Hampi.g:133:10: '='
             {
             match('='); 
 
@@ -505,8 +506,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = ASSIGN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:132:8: ( ':=' )
-            // src/hampi/parser/Hampi.g:132:10: ':='
+            // src/hampi/parser/Hampi.g:134:8: ( ':=' )
+            // src/hampi/parser/Hampi.g:134:10: ':='
             {
             match(":="); 
 
@@ -526,8 +527,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = SEMI;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:133:6: ( ';' )
-            // src/hampi/parser/Hampi.g:133:8: ';'
+            // src/hampi/parser/Hampi.g:135:6: ( ';' )
+            // src/hampi/parser/Hampi.g:135:8: ';'
             {
             match(';'); 
 
@@ -546,8 +547,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = COLON;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:134:7: ( ':' )
-            // src/hampi/parser/Hampi.g:134:9: ':'
+            // src/hampi/parser/Hampi.g:136:7: ( ':' )
+            // src/hampi/parser/Hampi.g:136:9: ':'
             {
             match(':'); 
 
@@ -566,8 +567,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = STAR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:135:5: ( '*' )
-            // src/hampi/parser/Hampi.g:135:7: '*'
+            // src/hampi/parser/Hampi.g:137:5: ( '*' )
+            // src/hampi/parser/Hampi.g:137:7: '*'
             {
             match('*'); 
 
@@ -586,8 +587,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = PLUS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:136:5: ( '+' )
-            // src/hampi/parser/Hampi.g:136:7: '+'
+            // src/hampi/parser/Hampi.g:138:5: ( '+' )
+            // src/hampi/parser/Hampi.g:138:7: '+'
             {
             match('+'); 
 
@@ -606,8 +607,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = BAR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:137:4: ( '|' )
-            // src/hampi/parser/Hampi.g:137:6: '|'
+            // src/hampi/parser/Hampi.g:139:4: ( '|' )
+            // src/hampi/parser/Hampi.g:139:6: '|'
             {
             match('|'); 
 
@@ -626,8 +627,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = MINUS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:138:7: ( '-' )
-            // src/hampi/parser/Hampi.g:138:9: '-'
+            // src/hampi/parser/Hampi.g:140:7: ( '-' )
+            // src/hampi/parser/Hampi.g:140:9: '-'
             {
             match('-'); 
 
@@ -646,8 +647,8 @@ public class HampiLexer extends Lexer {
         try {
             int _type = QUESTION;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:139:9: ( '?' )
-            // src/hampi/parser/Hampi.g:139:11: '?'
+            // src/hampi/parser/Hampi.g:141:9: ( '?' )
+            // src/hampi/parser/Hampi.g:141:11: '?'
             {
             match('?'); 
 
@@ -666,10 +667,10 @@ public class HampiLexer extends Lexer {
         try {
             int _type = INT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:141:5: ( ( '0' .. '9' )+ )
-            // src/hampi/parser/Hampi.g:141:7: ( '0' .. '9' )+
+            // src/hampi/parser/Hampi.g:143:5: ( ( '0' .. '9' )+ )
+            // src/hampi/parser/Hampi.g:143:7: ( '0' .. '9' )+
             {
-            // src/hampi/parser/Hampi.g:141:7: ( '0' .. '9' )+
+            // src/hampi/parser/Hampi.g:143:7: ( '0' .. '9' )+
             int cnt1=0;
             loop1:
             do {
@@ -683,7 +684,7 @@ public class HampiLexer extends Lexer {
 
                 switch (alt1) {
             	case 1 :
-            	    // src/hampi/parser/Hampi.g:141:8: '0' .. '9'
+            	    // src/hampi/parser/Hampi.g:143:8: '0' .. '9'
             	    {
             	    matchRange('0','9'); 
 
@@ -715,7 +716,7 @@ public class HampiLexer extends Lexer {
         try {
             int _type = ID;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:143:4: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '.' | '0' .. '9' )+ | '\\`' ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '.' | '0' .. '9' )+ '\\`' )
+            // src/hampi/parser/Hampi.g:145:4: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '.' | '0' .. '9' )+ | '\\`' ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '.' | '0' .. '9' )+ '\\`' )
             int alt4=2;
             int LA4_0 = input.LA(1);
 
@@ -733,9 +734,9 @@ public class HampiLexer extends Lexer {
             }
             switch (alt4) {
                 case 1 :
-                    // src/hampi/parser/Hampi.g:143:6: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '.' | '0' .. '9' )+
+                    // src/hampi/parser/Hampi.g:145:6: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '.' | '0' .. '9' )+
                     {
-                    // src/hampi/parser/Hampi.g:143:6: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '.' | '0' .. '9' )+
+                    // src/hampi/parser/Hampi.g:145:6: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '.' | '0' .. '9' )+
                     int cnt2=0;
                     loop2:
                     do {
@@ -777,10 +778,10 @@ public class HampiLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // src/hampi/parser/Hampi.g:143:46: '\\`' ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '.' | '0' .. '9' )+ '\\`'
+                    // src/hampi/parser/Hampi.g:145:46: '\\`' ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '.' | '0' .. '9' )+ '\\`'
                     {
                     match('`'); 
-                    // src/hampi/parser/Hampi.g:143:51: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '.' | '0' .. '9' )+
+                    // src/hampi/parser/Hampi.g:145:51: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '.' | '0' .. '9' )+
                     int cnt3=0;
                     loop3:
                     do {
@@ -837,11 +838,11 @@ public class HampiLexer extends Lexer {
         try {
             int _type = STR_LIT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:145:9: ( '\\\"' ( EscapeSequence | ~ ( '\\\"' | '\\\\' ) )* '\\\"' )
-            // src/hampi/parser/Hampi.g:145:11: '\\\"' ( EscapeSequence | ~ ( '\\\"' | '\\\\' ) )* '\\\"'
+            // src/hampi/parser/Hampi.g:147:9: ( '\\\"' ( EscapeSequence | ~ ( '\\\"' | '\\\\' ) )* '\\\"' )
+            // src/hampi/parser/Hampi.g:147:11: '\\\"' ( EscapeSequence | ~ ( '\\\"' | '\\\\' ) )* '\\\"'
             {
             match('\"'); 
-            // src/hampi/parser/Hampi.g:145:16: ( EscapeSequence | ~ ( '\\\"' | '\\\\' ) )*
+            // src/hampi/parser/Hampi.g:147:16: ( EscapeSequence | ~ ( '\\\"' | '\\\\' ) )*
             loop5:
             do {
                 int alt5=3;
@@ -857,14 +858,14 @@ public class HampiLexer extends Lexer {
 
                 switch (alt5) {
             	case 1 :
-            	    // src/hampi/parser/Hampi.g:145:18: EscapeSequence
+            	    // src/hampi/parser/Hampi.g:147:18: EscapeSequence
             	    {
             	    mEscapeSequence(); 
 
             	    }
             	    break;
             	case 2 :
-            	    // src/hampi/parser/Hampi.g:145:35: ~ ( '\\\"' | '\\\\' )
+            	    // src/hampi/parser/Hampi.g:147:35: ~ ( '\\\"' | '\\\\' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='[')||(input.LA(1)>=']' && input.LA(1)<='\uFFFE') ) {
             	        input.consume();
@@ -901,26 +902,26 @@ public class HampiLexer extends Lexer {
         try {
             int _type = CHAR_SEQ;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:147:10: ( '\\\\' ( '0' .. '9' ) ( '0' .. '9' ) ( '0' .. '9' ) )
-            // src/hampi/parser/Hampi.g:147:12: '\\\\' ( '0' .. '9' ) ( '0' .. '9' ) ( '0' .. '9' )
+            // src/hampi/parser/Hampi.g:149:10: ( '\\\\' ( '0' .. '9' ) ( '0' .. '9' ) ( '0' .. '9' ) )
+            // src/hampi/parser/Hampi.g:149:12: '\\\\' ( '0' .. '9' ) ( '0' .. '9' ) ( '0' .. '9' )
             {
             match('\\'); 
-            // src/hampi/parser/Hampi.g:147:17: ( '0' .. '9' )
-            // src/hampi/parser/Hampi.g:147:18: '0' .. '9'
+            // src/hampi/parser/Hampi.g:149:17: ( '0' .. '9' )
+            // src/hampi/parser/Hampi.g:149:18: '0' .. '9'
             {
             matchRange('0','9'); 
 
             }
 
-            // src/hampi/parser/Hampi.g:147:27: ( '0' .. '9' )
-            // src/hampi/parser/Hampi.g:147:28: '0' .. '9'
+            // src/hampi/parser/Hampi.g:149:27: ( '0' .. '9' )
+            // src/hampi/parser/Hampi.g:149:28: '0' .. '9'
             {
             matchRange('0','9'); 
 
             }
 
-            // src/hampi/parser/Hampi.g:147:37: ( '0' .. '9' )
-            // src/hampi/parser/Hampi.g:147:38: '0' .. '9'
+            // src/hampi/parser/Hampi.g:149:37: ( '0' .. '9' )
+            // src/hampi/parser/Hampi.g:149:38: '0' .. '9'
             {
             matchRange('0','9'); 
 
@@ -942,11 +943,11 @@ public class HampiLexer extends Lexer {
         try {
             int _type = CHAR_LIT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:149:10: ( '\\'' ( EscapeSequence | ~ ( '\\\"' | '\\\\' ) ) '\\'' )
-            // src/hampi/parser/Hampi.g:149:12: '\\'' ( EscapeSequence | ~ ( '\\\"' | '\\\\' ) ) '\\''
+            // src/hampi/parser/Hampi.g:151:10: ( '\\'' ( EscapeSequence | ~ ( '\\\"' | '\\\\' ) ) '\\'' )
+            // src/hampi/parser/Hampi.g:151:12: '\\'' ( EscapeSequence | ~ ( '\\\"' | '\\\\' ) ) '\\''
             {
             match('\''); 
-            // src/hampi/parser/Hampi.g:149:17: ( EscapeSequence | ~ ( '\\\"' | '\\\\' ) )
+            // src/hampi/parser/Hampi.g:151:17: ( EscapeSequence | ~ ( '\\\"' | '\\\\' ) )
             int alt6=2;
             int LA6_0 = input.LA(1);
 
@@ -964,14 +965,14 @@ public class HampiLexer extends Lexer {
             }
             switch (alt6) {
                 case 1 :
-                    // src/hampi/parser/Hampi.g:149:19: EscapeSequence
+                    // src/hampi/parser/Hampi.g:151:19: EscapeSequence
                     {
                     mEscapeSequence(); 
 
                     }
                     break;
                 case 2 :
-                    // src/hampi/parser/Hampi.g:149:36: ~ ( '\\\"' | '\\\\' )
+                    // src/hampi/parser/Hampi.g:151:36: ~ ( '\\\"' | '\\\\' )
                     {
                     if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='[')||(input.LA(1)>=']' && input.LA(1)<='\uFFFE') ) {
                         input.consume();
@@ -1003,8 +1004,8 @@ public class HampiLexer extends Lexer {
     // $ANTLR start EscapeSequence
     public final void mEscapeSequence() throws RecognitionException {
         try {
-            // src/hampi/parser/Hampi.g:153:5: ( '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' ) )
-            // src/hampi/parser/Hampi.g:153:9: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' )
+            // src/hampi/parser/Hampi.g:155:5: ( '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' ) )
+            // src/hampi/parser/Hampi.g:155:9: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' )
             {
             match('\\'); 
             if ( input.LA(1)=='\"'||input.LA(1)=='\''||input.LA(1)=='\\'||input.LA(1)=='b'||input.LA(1)=='f'||input.LA(1)=='n'||input.LA(1)=='r'||input.LA(1)=='t' ) {
@@ -1030,10 +1031,10 @@ public class HampiLexer extends Lexer {
         try {
             int _type = NEWLINE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:157:5: ( ( '\\r' )? '\\n' )
-            // src/hampi/parser/Hampi.g:157:7: ( '\\r' )? '\\n'
+            // src/hampi/parser/Hampi.g:159:5: ( ( '\\r' )? '\\n' )
+            // src/hampi/parser/Hampi.g:159:7: ( '\\r' )? '\\n'
             {
-            // src/hampi/parser/Hampi.g:157:7: ( '\\r' )?
+            // src/hampi/parser/Hampi.g:159:7: ( '\\r' )?
             int alt7=2;
             int LA7_0 = input.LA(1);
 
@@ -1042,7 +1043,7 @@ public class HampiLexer extends Lexer {
             }
             switch (alt7) {
                 case 1 :
-                    // src/hampi/parser/Hampi.g:157:7: '\\r'
+                    // src/hampi/parser/Hampi.g:159:7: '\\r'
                     {
                     match('\r'); 
 
@@ -1069,10 +1070,10 @@ public class HampiLexer extends Lexer {
         try {
             int _type = WS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:160:5: ( ( ' ' | '\\t' )+ )
-            // src/hampi/parser/Hampi.g:160:9: ( ' ' | '\\t' )+
+            // src/hampi/parser/Hampi.g:162:5: ( ( ' ' | '\\t' )+ )
+            // src/hampi/parser/Hampi.g:162:9: ( ' ' | '\\t' )+
             {
-            // src/hampi/parser/Hampi.g:160:9: ( ' ' | '\\t' )+
+            // src/hampi/parser/Hampi.g:162:9: ( ' ' | '\\t' )+
             int cnt8=0;
             loop8:
             do {
@@ -1127,12 +1128,12 @@ public class HampiLexer extends Lexer {
         try {
             int _type = COMMENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:164:5: ( '/*' ( options {greedy=false; } : . )* '*/' )
-            // src/hampi/parser/Hampi.g:164:9: '/*' ( options {greedy=false; } : . )* '*/'
+            // src/hampi/parser/Hampi.g:166:5: ( '/*' ( options {greedy=false; } : . )* '*/' )
+            // src/hampi/parser/Hampi.g:166:9: '/*' ( options {greedy=false; } : . )* '*/'
             {
             match("/*"); 
 
-            // src/hampi/parser/Hampi.g:164:14: ( options {greedy=false; } : . )*
+            // src/hampi/parser/Hampi.g:166:14: ( options {greedy=false; } : . )*
             loop9:
             do {
                 int alt9=2;
@@ -1157,7 +1158,7 @@ public class HampiLexer extends Lexer {
 
                 switch (alt9) {
             	case 1 :
-            	    // src/hampi/parser/Hampi.g:164:42: .
+            	    // src/hampi/parser/Hampi.g:166:42: .
             	    {
             	    matchAny(); 
 
@@ -1188,12 +1189,12 @@ public class HampiLexer extends Lexer {
         try {
             int _type = LINE_COMMENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // src/hampi/parser/Hampi.g:168:5: ( '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n' )
-            // src/hampi/parser/Hampi.g:168:7: '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
+            // src/hampi/parser/Hampi.g:170:5: ( '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n' )
+            // src/hampi/parser/Hampi.g:170:7: '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
             {
             match("//"); 
 
-            // src/hampi/parser/Hampi.g:168:13: (~ ( '\\n' | '\\r' ) )*
+            // src/hampi/parser/Hampi.g:170:13: (~ ( '\\n' | '\\r' ) )*
             loop10:
             do {
                 int alt10=2;
@@ -1206,7 +1207,7 @@ public class HampiLexer extends Lexer {
 
                 switch (alt10) {
             	case 1 :
-            	    // src/hampi/parser/Hampi.g:168:13: ~ ( '\\n' | '\\r' )
+            	    // src/hampi/parser/Hampi.g:170:13: ~ ( '\\n' | '\\r' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\t')||(input.LA(1)>='\u000B' && input.LA(1)<='\f')||(input.LA(1)>='\u000E' && input.LA(1)<='\uFFFE') ) {
             	        input.consume();
@@ -1226,7 +1227,7 @@ public class HampiLexer extends Lexer {
                 }
             } while (true);
 
-            // src/hampi/parser/Hampi.g:168:27: ( '\\r' )?
+            // src/hampi/parser/Hampi.g:170:27: ( '\\r' )?
             int alt11=2;
             int LA11_0 = input.LA(1);
 
@@ -1235,7 +1236,7 @@ public class HampiLexer extends Lexer {
             }
             switch (alt11) {
                 case 1 :
-                    // src/hampi/parser/Hampi.g:168:27: '\\r'
+                    // src/hampi/parser/Hampi.g:170:27: '\\r'
                     {
                     match('\r'); 
 
@@ -1258,14 +1259,14 @@ public class HampiLexer extends Lexer {
     // $ANTLR end LINE_COMMENT
 
     public void mTokens() throws RecognitionException {
-        // src/hampi/parser/Hampi.g:1:8: ( T__65 | KW_VAR | KW_CONCAT | KW_CFG | KW_VAL | KW_REG | KW_QUERY | KW_FIX | KW_ASSERT | KW_CONTAINS | KW_IN | KW_STAR | KW_OR | KW_NOT | LPAREN | RPAREN | LSQUARE | RSQUARE | COMMA | EQUALS | ASSIGN | SEMI | COLON | STAR | PLUS | BAR | MINUS | QUESTION | INT | ID | STR_LIT | CHAR_SEQ | CHAR_LIT | NEWLINE | WS | COMMENT | LINE_COMMENT )
+        // src/hampi/parser/Hampi.g:1:8: ( T__66 | KW_VAR | KW_CONCAT | KW_CFG | KW_VAL | KW_REG | KW_QUERY | KW_FIX | KW_ASSERT | KW_CONTAINS | KW_IN | KW_STAR | KW_OR | KW_NOT | LPAREN | RPAREN | LSQUARE | RSQUARE | COMMA | EQUALS | ASSIGN | SEMI | COLON | STAR | PLUS | BAR | MINUS | QUESTION | INT | ID | STR_LIT | CHAR_SEQ | CHAR_LIT | NEWLINE | WS | COMMENT | LINE_COMMENT )
         int alt12=37;
         alt12 = dfa12.predict(input);
         switch (alt12) {
             case 1 :
-                // src/hampi/parser/Hampi.g:1:10: T__65
+                // src/hampi/parser/Hampi.g:1:10: T__66
                 {
-                mT__65(); 
+                mT__66(); 
 
                 }
                 break;
@@ -1684,7 +1685,7 @@ public class HampiLexer extends Lexer {
             this.transition = DFA12_transition;
         }
         public String getDescription() {
-            return "1:1: Tokens : ( T__65 | KW_VAR | KW_CONCAT | KW_CFG | KW_VAL | KW_REG | KW_QUERY | KW_FIX | KW_ASSERT | KW_CONTAINS | KW_IN | KW_STAR | KW_OR | KW_NOT | LPAREN | RPAREN | LSQUARE | RSQUARE | COMMA | EQUALS | ASSIGN | SEMI | COLON | STAR | PLUS | BAR | MINUS | QUESTION | INT | ID | STR_LIT | CHAR_SEQ | CHAR_LIT | NEWLINE | WS | COMMENT | LINE_COMMENT );";
+            return "1:1: Tokens : ( T__66 | KW_VAR | KW_CONCAT | KW_CFG | KW_VAL | KW_REG | KW_QUERY | KW_FIX | KW_ASSERT | KW_CONTAINS | KW_IN | KW_STAR | KW_OR | KW_NOT | LPAREN | RPAREN | LSQUARE | RSQUARE | COMMA | EQUALS | ASSIGN | SEMI | COLON | STAR | PLUS | BAR | MINUS | QUESTION | INT | ID | STR_LIT | CHAR_SEQ | CHAR_LIT | NEWLINE | WS | COMMENT | LINE_COMMENT );";
         }
     }
  

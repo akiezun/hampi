@@ -146,6 +146,18 @@ public final class SolutionChecker{
       }
       return hampi.concatExpr(exprs);
     }
+    case EXPR_SUBSEQUENCE: {
+      HSubsequenceExpression ce = (HSubsequenceExpression) expression;
+      HStatement decl = prog.getDecl(ce.getName());
+      switch (decl.getKind()){
+      case STMT_VARDECL: {
+        HVarDeclStatement v = (HVarDeclStatement) decl;
+        return hampi.subsequenceExpr(hampi.varExpr(v.getVarName()), ce.getStartIndex(), ce.getLength());
+      }
+      default:
+        throw new IllegalStateException("invalid usage of variable reference " + ce.getName() + " \n" + prog);
+      }
+    }
     default:
       throw new IllegalStateException("invalid expressio " + expression);
     }

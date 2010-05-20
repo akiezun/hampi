@@ -81,4 +81,8 @@ public final class HampiConstraints{
     return new VariableExpression(name);
   }
 
+  public static Expression subsequenceExpr(Expression expr, int fromIndex, int len){
+    return new SubsequenceExpression(expr, fromIndex, len);
+  }
+
 }

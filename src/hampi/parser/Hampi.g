@@ -20,6 +20,7 @@ grammar Hampi;
 	    IN;
 	    ASSERT;
 	    CONCAT;
+	    SUBSEQUENCE;
 	    VAR;
 	    CFG;
 	    REG;
@@ -96,7 +97,8 @@ grammar Hampi;
 	
 	expr : STR_LIT -> STR_LIT
 	     | ID      -> ID
-	     | (KW_CONCAT LPAREN expr (COMMA expr)* RPAREN) -> ^(CONCAT expr+);
+	     | (KW_CONCAT LPAREN expr (COMMA expr)* RPAREN) -> ^(CONCAT expr+)
+	     | ID LSQUARE INT COLON INT RSQUARE -> ^(SUBSEQUENCE ID INT INT);
 	
 	assertStmt : (KW_ASSERT boolExpr) -> ^(ASSERT boolExpr);
 

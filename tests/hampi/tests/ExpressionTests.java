@@ -49,4 +49,19 @@ public class ExpressionTests extends TestCase{
     Regexp re = hampi.concatRegexp(astar, b, astar, b, astar); // a* b a* b a* (exactly 2 bs)
     assertEquals("[a* . b . a* . b . a*]", re.toString());
   }
+
+  public void testSubsequenceExpression() throws Exception{
+    Regexp aplusb = hampi.orRegexp(hampi.constRegexp("a"), hampi.constRegexp("b"));
+    Regexp aplusbstar = hampi.starRegexp(aplusb);
+    Regexp re = hampi.concatRegexp(aplusbstar, hampi.constRegexp("c")); // (a+b)*c
+    Expression e = hampi.varExpr("v1");
+    Expression sub = hampi.subsequenceExpr(e, 2, 3);
+    Constraint c1 = hampi.regexpConstraint(sub, true, re);
+    Constraint c = hampi.andConstraint(c1);
+
+    assertEquals(c.getVariables().toString(), 1, c.getVariables().size());
+    //bad style to assert on tostring but this is just a smoke test
+    assertEquals("VAR(v1)[2,3] in [[a-b]* . c]", c.toString());
+  }
+
 }
