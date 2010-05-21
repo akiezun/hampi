@@ -2,6 +2,8 @@ package hampi;
 
 import hampi.constraints.*;
 
+import java.util.Set;
+
 /**
  * Common class for solver implementations.
  */
@@ -40,6 +42,23 @@ public abstract class AbstractSolver{
       }
     }
     return null;
+  }
+
+  /**
+   * Check that no subsequence result should be outside the length of the solution
+  Should not happen when using the Hampi parser, but can happen when creating the constaints
+  using the Java API.
+   *
+   */
+  protected boolean isValidSubsequencesLength(Constraint c, int size){
+    for (Constraint conjunct : c.getConjuncts()){
+      Set<SubsequenceExpression> subsequences = conjunct.getSubsequenceVals();
+      for (SubsequenceExpression sub : subsequences){
+        if (!sub.isValid(size))
+          return false;
+      }
+    }
+    return true;
   }
 
   /**

@@ -93,6 +93,15 @@ public final class AndConstraint extends Constraint{
   }
 
   @Override
+  public Set<SubsequenceExpression> getSubsequenceVals(){
+    Set<SubsequenceExpression> result = new LinkedHashSet<SubsequenceExpression>();
+    for (Constraint c : constraints){
+      result.addAll(c.getSubsequenceVals());
+    }
+    return result;
+  }
+
+  @Override
   public void accept(ConstraintGrammarVisitor visitor){
     for (Constraint c : constraints){
       c.accept(visitor);

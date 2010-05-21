@@ -1,7 +1,7 @@
 package hampi.parser;
 
 import hampi.HampiException;
-import hampi.parser.HProgramParser.HTypeEnvironment;
+import hampi.parser.HProgram.HTypeEnvironment;
 import hampi.utils.Utils;
 
 public final class HContainsExpression extends HBooleanExpression{
@@ -37,8 +37,7 @@ public final class HContainsExpression extends HBooleanExpression{
   }
 
   @Override
-  public void typeCheck(HTypeEnvironment tenv){
-    //nothing
+  public void typeCheck(HTypeEnvironment tenv, HVarDeclStatement varDecl){
     if (tenv.getType(id) == null)
       throw new HampiException("undefined variable " + id + " in 'contains'");
   }

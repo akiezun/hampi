@@ -909,7 +909,7 @@ public class SolverTests extends TestCase{
  */
   public void testSubsequenceConstraints() throws Exception{
     Hampi h = new Hampi();
-    Expression v = h.varExpr("v");
+    VariableExpression v = h.varExpr("v");
     Expression prefix = h.subsequenceExpr(v, 0, 2);
     Expression suffix = h.subsequenceExpr(v, 2, 3);
     Regexp r1 = h.starRegexp(h.constRegexp('a'));
@@ -935,7 +935,7 @@ public class SolverTests extends TestCase{
    */
   public void testSubsequenceAndVarInSameConcat() throws Exception{
     Hampi h = new Hampi();
-    Expression v = h.varExpr("v");
+    VariableExpression v = h.varExpr("v");
     Expression prefix = h.subsequenceExpr(v, 0, 2);
     Expression compose = h.concatExpr(h.constExpr("a"), prefix, h.constExpr("b"), v, h.constExpr("c"));
     Regexp r1 = h.starRegexp(h.constRegexp('x'));
@@ -957,7 +957,7 @@ public class SolverTests extends TestCase{
    */
   public void testSubsequenceInConstantRegExp() throws Exception{
     Hampi h = new Hampi();
-    Expression v = h.varExpr("v");
+    VariableExpression v = h.varExpr("v");
     Expression prefix = h.subsequenceExpr(v, 0, 2);
     Constraint c = h.regexpConstraint(prefix, true, h.constRegexp("xx"));
 
@@ -983,6 +983,47 @@ public class SolverTests extends TestCase{
     }
   }
 
+  /**
+   * var v:6;
+   * val vSub := v[2:3]; //substring of v (offset 2, length 3)
+   * assert v contains "fred";
+   * assert vSub contains "de"
+   * //EXPECT v = frede
+   */
+  public void testSubsequenceAndVarSimpleConcat() throws Exception{
+    Hampi h = new Hampi();
+    VariableExpression v = h.varExpr("v");
+    Expression vSub = h.subsequenceExpr(v, 2, 3);
+    Regexp sigma_star = h.starRegexp(h.rangeRegexp((char) 0, (char) 255));
+    Constraint c1 = h.regexpConstraint(v, true, h.concatRegexp(sigma_star, h.constRegexp("fred"), sigma_star));
+    Constraint c2 = h.regexpConstraint(vSub, true, h.concatRegexp(sigma_star, h.constRegexp("de"), sigma_star));
+
+    Constraint c = h.andConstraint(c1, c2);
+
+    for (Solution solution : solve(h, c, 5)){
+      assertTrue(solution.isSatisfiable());
+      assertEquals("frede", solution.getValue(v));
+    }
+  }
+
+  /**
+   * var v:4; val vSub := v[2:3]; //substring of v (offset 2, length 3) assert v
+   * contains "fred"; assert vSub contains "de"; //EXPECT v = frede
+   */
+  public void testSubsequenceAndVarSimpleConcatToShortVar() throws Exception{
+    Hampi h = new Hampi();
+    VariableExpression v = h.varExpr("v");
+    Expression vSub = h.subsequenceExpr(v, 2, 3);
+    Regexp sigma_star = h.starRegexp(h.rangeRegexp((char) 0, (char) 255));
+    Constraint c1 = h.regexpConstraint(v, true, h.concatRegexp(sigma_star, h.constRegexp("fred"), sigma_star));
+    Constraint c2 = h.regexpConstraint(vSub, true, h.concatRegexp(sigma_star, h.constRegexp("de"), sigma_star));
+
+    Constraint c = h.andConstraint(c1, c2);
+
+    for (Solution solution : solve(h, c, 4)){
+      assertFalse(solution.isSatisfiable());
+    }
+  }
 
 
   public void testMultiConstraints2() throws Exception{

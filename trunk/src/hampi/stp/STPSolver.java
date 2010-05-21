@@ -66,7 +66,7 @@ public class STPSolver extends AbstractSolver{
 
       int min = constraint.varLengthLowerBound();
 
-      if (size < min)
+      if (size < min || !isValidSubsequencesLength(constraint, size))
         return Solution.createUNSAT(); //cut this short
 
       VariableExpression v = constraint.getVariables().iterator().next();

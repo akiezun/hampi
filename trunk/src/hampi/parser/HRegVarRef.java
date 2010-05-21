@@ -1,6 +1,6 @@
 package hampi.parser;
 
-import hampi.parser.HProgramParser.HTypeEnvironment;
+import hampi.parser.HProgram.HTypeEnvironment;
 
 public final class HRegVarRef extends HRegDefinition{
 

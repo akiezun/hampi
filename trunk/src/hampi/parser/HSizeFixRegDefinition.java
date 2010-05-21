@@ -1,7 +1,7 @@
 package hampi.parser;
 
 import hampi.HampiException;
-import hampi.parser.HProgramParser.HTypeEnvironment;
+import hampi.parser.HProgram.HTypeEnvironment;
 
 public final class HSizeFixRegDefinition extends HRegDefinition{
 

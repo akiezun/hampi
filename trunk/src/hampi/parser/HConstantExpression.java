@@ -1,6 +1,6 @@
 package hampi.parser;
 
-import hampi.parser.HProgramParser.HTypeEnvironment;
+import hampi.parser.HProgram.HTypeEnvironment;
 import hampi.utils.Utils;
 
 public final class HConstantExpression extends HExpression{
@@ -27,7 +27,7 @@ public final class HConstantExpression extends HExpression{
   }
 
   @Override
-  public void typeCheck(HTypeEnvironment tenv){
+  public void typeCheck(HTypeEnvironment tenv, HVarDeclStatement varDecl){
     //nothing
   }
 

@@ -54,7 +54,7 @@ public class ExpressionTests extends TestCase{
     Regexp aplusb = hampi.orRegexp(hampi.constRegexp("a"), hampi.constRegexp("b"));
     Regexp aplusbstar = hampi.starRegexp(aplusb);
     Regexp re = hampi.concatRegexp(aplusbstar, hampi.constRegexp("c")); // (a+b)*c
-    Expression e = hampi.varExpr("v1");
+    VariableExpression e = hampi.varExpr("v1");
     Expression sub = hampi.subsequenceExpr(e, 2, 3);
     Constraint c1 = hampi.regexpConstraint(sub, true, re);
     Constraint c = hampi.andConstraint(c1);

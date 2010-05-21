@@ -1,7 +1,7 @@
 package hampi.parser;
 
 import hampi.HampiException;
-import hampi.parser.HProgramParser.HTypeEnvironment;
+import hampi.parser.HProgram.HTypeEnvironment;
 
 import java.util.*;
 
@@ -43,9 +43,9 @@ public final class HConcatExpression extends HExpression{
   }
 
   @Override
-  public void typeCheck(HTypeEnvironment tenv){
+  public void typeCheck(HTypeEnvironment tenv, HVarDeclStatement varDecl){
     for (HExpression sube : subexprs){
-      sube.typeCheck(tenv);
+      sube.typeCheck(tenv, varDecl);
       HType type = sube.getType(tenv);
       if (type != HType.STRING_TYPE)
         throw new HampiException("invalid type in concat " + sube + " type " + type + " (expected string)");

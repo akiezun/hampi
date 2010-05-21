@@ -67,7 +67,7 @@ public final class Hampi{
   /**
    * Creates an variable with the given name.
    */
-  public Expression varExpr(String name){
+  public VariableExpression varExpr(String name){
     return HampiConstraints.varExpr(name);
   }
 
@@ -95,7 +95,7 @@ public final class Hampi{
   /**
    * Creates a subsequence expression
    */
-  public Expression subsequenceExpr(Expression expr, int fromIndex, int len){
+  public Expression subsequenceExpr(VariableExpression expr, int fromIndex, int len){
     return HampiConstraints.subsequenceExpr(expr, fromIndex, len);
   }
 
@@ -294,7 +294,7 @@ public final class Hampi{
           hampi.getSolver().verbose = verbose;
         }
         Solution solve = hampi.solve(c, size);
-        if (verbose){ 
+        if (verbose){
            System.out.println("solution for size " + size + " " + solve);
         }
         if (solve.isSatisfiable()){

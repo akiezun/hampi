@@ -1,6 +1,7 @@
 package hampi.parser;
 
-import hampi.parser.HProgramParser.HTypeEnvironment;
+import hampi.parser.HProgram.HTypeEnvironment;
+
 
 public abstract class HStatement extends HAbstractGrammarElement{
 
@@ -8,5 +9,5 @@ public abstract class HStatement extends HAbstractGrammarElement{
     super(kind);
   }
 
-  public abstract void typeCheck(HTypeEnvironment tenv);
+  public abstract void typeCheck(HTypeEnvironment typeEnvironment, HVarDeclStatement varDecl);
 }

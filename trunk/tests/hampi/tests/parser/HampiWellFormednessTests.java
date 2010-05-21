@@ -13,6 +13,7 @@ public class HampiWellFormednessTests extends TestCase{
     if (checkWellFormedness == null){
       fail("expected to fail well-formedness test " + reason + "  " + path);
     }
+    assertEquals(reason, checkWellFormedness);
   }
 
   private void checkPass(String path) throws Exception{
@@ -22,47 +23,47 @@ public class HampiWellFormednessTests extends TestCase{
   }
 
   public void testZeroVars() throws Exception{
-    checkFail("testVar0.txt", "zero variables");
+    checkFail("testVar0.txt", "no string variable declared");
   }
 
   public void testTwoVars() throws Exception{
-    checkFail("testVar2.txt", "two variables");
+    checkFail("testVar2.txt", "more than one string variable declared x y");
   }
 
   public void testNoAsserts() throws Exception{
-    checkFail("testNoAsserts.txt", "no asserts");
+    checkFail("testNoAsserts.txt", "at least one assert expected");
   }
 
   public void testNamesDefined1() throws Exception{
-    checkFail("testNamesDefined1.txt", "all nonterminals defined");
+    checkFail("testNamesDefined1.txt", "undefined nonterminal B");
   }
 
   public void testNamesDefined2() throws Exception{
-    checkFail("testNamesDefined2.txt", "all names defined");
+    checkFail("testNamesDefined2.txt", "undefined variable v in 'contains'");
   }
 
   public void testNamesDefined3() throws Exception{
-    checkFail("testNamesDefined3.txt", "all names defined");
+    checkFail("testNamesDefined3.txt", "B not of type CFG_TYPE");
   }
 
   public void testNamesDefined4() throws Exception{
-    checkFail("testNamesDefined4.txt", "all names defined");
+    checkFail("testNamesDefined4.txt", "extected string type on left in 'in' but got null in v in R");
   }
 
   public void testNamesDefined5() throws Exception{
-    checkFail("testNamesDefined5.txt", "all names defined");
+    checkFail("testNamesDefined5.txt", "extected reg or cfg type on right in 'in' but got null in x in S");
   }
 
   public void testNonterminalsDefinedOnce() throws Exception{
-    checkFail("testNonterminalsDefinedOnce.txt", "all nonterminals defined once");
+    checkFail("testNonterminalsDefinedOnce.txt", "multiply defined variable A");
   }
 
   public void testNonterminals() throws Exception{
-    checkFail("testNonterminals.txt", "cfg rules use only noterminals");
+    checkFail("testNonterminals.txt", "expected a nonterminal x");
   }
 
   public void testTypecheck() throws Exception{
-    checkFail("testTypecheck.txt", "not cfg used in fix");
+    checkFail("testTypecheck.txt", "x not of type CFG_TYPE");
   }
 
   public void testTypecheck1() throws Exception{
@@ -83,6 +84,10 @@ public class HampiWellFormednessTests extends TestCase{
 
   public void testTypecheck4() throws Exception{
     checkPass("testTypecheck4.text");
+  }
+
+  public void testTypecheckToLongSubsequence() throws Exception{
+    checkFail("testTypecheck5.txt", "subsequence cannot end after the variable ends");
   }
 
 }

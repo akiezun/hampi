@@ -2,14 +2,14 @@ package hampi.constraints;
 
 import hampi.Solution;
 
-import java.util.Set;
+import java.util.*;
 
 public class SubsequenceExpression extends Expression{
-  private final Expression expr;
+  private final VariableExpression expr;
   private final int fromIndex;
   private final int len;
 
-  public SubsequenceExpression(Expression expr, int fromIndex, int len){
+  public SubsequenceExpression(VariableExpression expr, int fromIndex, int len){
     super(ElementKind.SUBSEQUENCE_EXPRESSION);
     this.expr = expr;
     this.fromIndex = fromIndex;
@@ -45,6 +45,11 @@ public class SubsequenceExpression extends Expression{
   }
 
   @Override
+  public Set<SubsequenceExpression> getSubsequenceVals(){
+    return Collections.singleton(this);
+  }
+
+  @Override
   public int hashCode(){
     return expr.hashCode() + 7 * (fromIndex + len);
   }
@@ -71,6 +76,10 @@ public class SubsequenceExpression extends Expression{
 
   public int getStartIndex(){
     return fromIndex;
+  }
+
+  public boolean isValid(int size){
+    return len + fromIndex <= size;
   }
 
 }

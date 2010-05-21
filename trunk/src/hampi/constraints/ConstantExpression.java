@@ -67,6 +67,11 @@ public final class ConstantExpression extends Expression{
   }
 
   @Override
+  public Set<SubsequenceExpression> getSubsequenceVals(){
+    return Collections.emptySet();
+  }
+
+  @Override
   public void accept(ConstraintGrammarVisitor visitor){
     visitor.visitConstantExpression(this);
   }
