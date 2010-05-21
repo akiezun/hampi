@@ -1,6 +1,7 @@
 package hampi.parser;
 
-import hampi.parser.HProgramParser.HTypeEnvironment;
+import hampi.HampiException;
+import hampi.parser.HProgram.HTypeEnvironment;
 
 public final class HSubsequenceExpression extends HExpression{
   private final String id;
@@ -23,8 +24,9 @@ public final class HSubsequenceExpression extends HExpression{
   }
 
   @Override
-  public void typeCheck(HTypeEnvironment tenv){
-    //nothing
+  public void typeCheck(HTypeEnvironment tenv, HVarDeclStatement varDecl){
+    if (startIndex + len > varDecl.getSizeMax())
+      throw new HampiException("subsequence cannot end after the variable ends");
   }
 
   public int getStartIndex(){

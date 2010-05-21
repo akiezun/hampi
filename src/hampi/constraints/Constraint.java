@@ -67,6 +67,11 @@ public abstract class Constraint{
   public abstract Set<VariableExpression> getVariables();
 
   /**
+   * Returns the set of all subsequence values mentioned in this constraint.
+   */
+  public abstract Set<SubsequenceExpression> getSubsequenceVals();
+
+  /**
    * Implements the visitor pattern.
    */
   public abstract void accept(ConstraintGrammarVisitor visitor);

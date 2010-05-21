@@ -1,6 +1,6 @@
 package hampi.parser;
 
-import hampi.parser.HProgramParser.HTypeEnvironment;
+import hampi.HampiException;
 
 import java.util.*;
 
@@ -55,9 +55,9 @@ public final class HProgram extends HAbstractGrammarElement{
     return b.toString();
   }
 
-  public void typeCheck(HTypeEnvironment tenv){
+  public void typeCheck(){
     for (HStatement stmt : statements){
-      stmt.typeCheck(tenv);
+      stmt.typeCheck(getTypeEnvironment(), getVarDecl());
     }
   }
 
@@ -177,4 +177,67 @@ public final class HProgram extends HAbstractGrammarElement{
     }
     return result;
   }
+
+  public static class HTypeEnvironment{
+    private final Map<String, HType> types;
+
+    public HTypeEnvironment(){
+      types = new LinkedHashMap<String, HType>();
+    }
+
+    /**
+     * Sets the new type, returns the old type or null if there was no old type.
+     */
+    public HType add(String name, HType type){
+      return types.put(name, type);
+    }
+
+    public HType getType(String varname){
+      return types.get(varname);
+    }
+
+    public Set<String> getVarNames(){
+      return types.keySet();
+    }
+
+    @Override
+    public String toString(){
+      return types.toString();
+    }
+  }
+
+  /**
+   * Creates a mapping from variable names to types.
+   */
+  private HTypeEnvironment getTypeEnvironment(){
+    HTypeEnvironment tenv = new HTypeEnvironment();
+    for (HStatement stmt : getStatements()){
+      if (stmt instanceof HVarDeclStatement){
+        HVarDeclStatement s = (HVarDeclStatement) stmt;
+        HType oldType = tenv.add(s.getVarName(), HType.STRING_TYPE);
+        if (oldType != null)
+          throw new HampiException("multiply defined variable " + s.getVarName());
+      }
+      if (stmt instanceof CFGStatement){
+        CFGStatement s = (CFGStatement) stmt;
+        HType oldType = tenv.add(s.getVarName(), HType.CFG_TYPE);
+        if (oldType != null)
+          throw new HampiException("multiply defined variable " + s.getVarName());
+      }
+      if (stmt instanceof HRegDeclStatement){
+        HRegDeclStatement s = (HRegDeclStatement) stmt;
+        HType oldType = tenv.add(s.getVarName(), HType.REG_TYPE);
+        if (oldType != null)
+          throw new HampiException("multiply defined variable " + s.getVarName());
+      }
+      if (stmt instanceof HValDeclStatement){
+        HValDeclStatement s = (HValDeclStatement) stmt;
+        HType oldType = tenv.add(s.getVarName(), s.getExpression().getType(tenv));
+        if (oldType != null)
+          throw new HampiException("multiply defined variable " + s.getVarName());
+      }
+    }
+    return tenv;
+  }
+
 }

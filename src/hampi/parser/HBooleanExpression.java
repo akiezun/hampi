@@ -1,6 +1,6 @@
 package hampi.parser;
 
-import hampi.parser.HProgramParser.HTypeEnvironment;
+import hampi.parser.HProgram.HTypeEnvironment;
 
 public abstract class HBooleanExpression extends HExpression{
 
@@ -12,4 +12,5 @@ public abstract class HBooleanExpression extends HExpression{
   public final HType getType(HTypeEnvironment tenv){
     return HType.BOOLEAN_TYPE;
   }
+
 }

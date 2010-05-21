@@ -1,6 +1,6 @@
 package hampi.parser;
 
-import hampi.parser.HProgramParser.HTypeEnvironment;
+import hampi.parser.HProgram.HTypeEnvironment;
 
 import java.util.*;
 
@@ -54,7 +54,7 @@ public final class CFGStatement extends HStatement{
   }
 
   @Override
-  public void typeCheck(HTypeEnvironment tenv){
+  public void typeCheck(HTypeEnvironment tenv, HVarDeclStatement varDecl){
     for (List<CFGProductionElement> elems : elementSets){
       for (CFGProductionElement elem : elems){
         elem.typeCheck(tenv);

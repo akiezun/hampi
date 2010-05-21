@@ -81,4 +81,9 @@ public abstract class Expression{
    * Integer.MAX_VALUE if no bound exists.
    */
   public abstract int getSizeUpperBound();
+
+  /**
+   * Returns the set of variables used in this expression.
+   */
+  public abstract Set<SubsequenceExpression> getSubsequenceVals();
 }

@@ -1,6 +1,7 @@
 package hampi.parser;
 
-import hampi.parser.HProgramParser.HTypeEnvironment;
+import hampi.parser.HProgram.HTypeEnvironment;
+
 
 public final class HRegDeclStatement extends HStatement{
 
@@ -29,7 +30,7 @@ public final class HRegDeclStatement extends HStatement{
   }
 
   @Override
-  public void typeCheck(HTypeEnvironment tenv){
+  public void typeCheck(HTypeEnvironment tenv, HVarDeclStatement varDecl){
     reg.typeCheck(tenv);
   }
 

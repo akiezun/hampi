@@ -1,6 +1,6 @@
 package hampi.parser;
 
-import hampi.parser.HProgramParser.HTypeEnvironment;
+import hampi.parser.HProgram.HTypeEnvironment;
 import hampi.utils.Utils;
 
 public class HConstRegexp extends HRegDefinition{

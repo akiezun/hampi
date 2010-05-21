@@ -77,11 +77,11 @@ public final class HampiConstraints{
     return new StarRegexp(r);
   }
 
-  public static Expression varExpr(String name){
+  public static VariableExpression varExpr(String name){
     return new VariableExpression(name);
   }
 
-  public static Expression subsequenceExpr(Expression expr, int fromIndex, int len){
+  public static SubsequenceExpression subsequenceExpr(VariableExpression expr, int fromIndex, int len){
     return new SubsequenceExpression(expr, fromIndex, len);
   }
 

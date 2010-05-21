@@ -3,10 +3,11 @@
 package hampi.parser;
 
 
+import java.util.*;
+
 import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
+import org.antlr.runtime.BitSet;
+import org.antlr.runtime.tree.*;
 
 public class HampiTree extends TreeParser {
     public static final String[] tokenNames = new String[] {

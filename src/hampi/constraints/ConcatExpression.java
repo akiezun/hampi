@@ -82,6 +82,15 @@ public final class ConcatExpression extends Expression{
   }
 
   @Override
+  public Set<SubsequenceExpression> getSubsequenceVals(){
+    Set<SubsequenceExpression> result = new LinkedHashSet<SubsequenceExpression>();
+    for (Expression expression : subexpressions){
+      result.addAll(expression.getSubsequenceVals());
+    }
+    return result;
+  }
+
+  @Override
   public void accept(ConstraintGrammarVisitor visitor){
     for (Expression e : subexpressions){
       e.accept(visitor);

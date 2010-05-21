@@ -93,6 +93,11 @@ public final class RegexpConstraint extends Constraint{
   public Set<VariableExpression> getVariables(){
     return expr.getVariables();
   }
+  
+  @Override
+  public Set<SubsequenceExpression> getSubsequenceVals(){
+    return expr.getSubsequenceVals();
+  }
 
   @Override
   public void accept(ConstraintGrammarVisitor visitor){

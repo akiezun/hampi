@@ -1,7 +1,7 @@
 package hampi.parser;
 
 import hampi.HampiException;
-import hampi.parser.HProgramParser.HTypeEnvironment;
+import hampi.parser.HProgram.HTypeEnvironment;
 
 /**
  * Represents the 'in' expression. For example 'v in S'.
@@ -37,7 +37,7 @@ public final class HInExpression extends HBooleanExpression{
   }
 
   @Override
-  public void typeCheck(HTypeEnvironment tenv){
+  public void typeCheck(HTypeEnvironment tenv, HVarDeclStatement varDecl){
     if (tenv.getType(id1) != HType.STRING_TYPE)
       throw new HampiException("extected string type on left in 'in' but got " + tenv.getType(id1) + " in " + unparse());
     if (tenv.getType(id2) != HType.REG_TYPE && tenv.getType(id2) != HType.CFG_TYPE)
