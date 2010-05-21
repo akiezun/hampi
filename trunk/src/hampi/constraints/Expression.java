@@ -72,18 +72,13 @@ public abstract class Expression{
   public abstract String toJavaCode(String hampiVar);
 
   /**
-   * Returns the smallest length of any this under any substitution.
-   */
-  public abstract int getSizeLowerBound();
-
-  /**
-   * Returns the largest length of any this under any substitution. Returns
-   * Integer.MAX_VALUE if no bound exists.
-   */
-  public abstract int getSizeUpperBound();
-
-  /**
    * Returns the set of variables used in this expression.
    */
   public abstract Set<SubsequenceExpression> getSubsequenceVals();
+
+  /**
+   * Returns the size of the expression under a substitution with variable on
+   * length varLength
+   */
+  public abstract int getSize(int varLength);
 }
