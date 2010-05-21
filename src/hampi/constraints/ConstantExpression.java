@@ -87,12 +87,8 @@ public final class ConstantExpression extends Expression{
   }
 
   @Override
-  public int getSizeLowerBound(){
-    return getSizeUpperBound(); //both bounds are equal
-  }
-
-  @Override
-  public int getSizeUpperBound(){
+  public int getSize(int varSize){
     return str.length();
   }
+
 }

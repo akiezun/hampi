@@ -23,32 +23,10 @@ public abstract class AbstractSolver{
   public abstract Solution solve(Constraint c, int size);
 
   /**
-   * Solve simple cases without using any encoding.
-   */
-  protected Solution trySimpleCases(Constraint c){
-    for (Constraint conjunct : c.getConjuncts()){
-      if (conjunct.getKind() == ElementKind.REGEXP_CONSTRAINT){
-        RegexpConstraint reg = (RegexpConstraint) conjunct;
-        if (reg.isMembership()){
-          Expression expr = reg.getExpression();
-          Regexp regexp = reg.getRegexp();
-          //if the expression is necessarily longer than the regexp, stop right here
-          if (expr.getSizeLowerBound() > regexp.getSizeUpperBound())
-            return Solution.createUNSAT();
-          //if the expression is necessarily shorter than the regexp, stop right here
-          if (expr.getSizeUpperBound() < regexp.getSizeLowerBound())
-            return Solution.createUNSAT();
-        }
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Check that no subsequence result should be outside the length of the solution
-  Should not happen when using the Hampi parser, but can happen when creating the constaints
-  using the Java API.
-   *
+   * Check that no subsequence result should be outside the length of the
+   * solution Should not happen when using the Hampi parser, but can happen when
+   * creating the constaints using the Java API.
+   * 
    */
   protected boolean isValidSubsequencesLength(Constraint c, int size){
     for (Constraint conjunct : c.getConjuncts()){

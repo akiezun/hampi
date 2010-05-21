@@ -547,18 +547,6 @@ public class SolverTests extends TestCase{
     }
   }
 
-  // a  = "ab(ab)*" (no solutions trivially)
-  public void test10() throws Exception{
-    Hampi h = new Hampi();
-    Expression e = h.constExpr("a");
-    Regexp re = h.concatRegexp(h.constRegexp("ab"), h.starRegexp(h.constRegexp("ab"))); // empty string
-    Constraint c = h.regexpConstraint(e, true, re);
-
-    for (Solution solution : solve(h, c, 1)){
-      assertTrue(!solution.isSatisfiable());
-    }
-  }
-
   public void testSigmaStarASigmaStar() throws Exception{
     Hampi h = new Hampi();
 
@@ -798,82 +786,6 @@ public class SolverTests extends TestCase{
 
   }
 
-  public void testBounds() throws Exception{
-    Hampi h = new Hampi();
-    Regexp b = h.constRegexp("b");
-    Regexp ab = h.constRegexp("ab");
-
-    Expression v = h.varExpr("v");
-    Expression av = h.concatExpr(h.constExpr("a"), v);
-    Constraint c1 = h.regexpConstraint(v, true, b); //v in b
-    Constraint c2 = h.regexpConstraint(av, true, ab); //a v in a b
-
-    Constraint c = h.andConstraint(c1, c2);
-    System.out.println(c);
-    assertEquals(1, c.varLengthLowerBound());
-    assertEquals(1, c.varLengthUpperBound());
-  }
-
-  public void testBounds0() throws Exception{
-    Hampi h = new Hampi();
-    Regexp b = h.constRegexp("b");
-
-    Expression v = h.varExpr("v");
-    Constraint c1 = h.regexpConstraint(v, true, b); //v in b
-
-    System.out.println(c1);
-    assertEquals(1, c1.varLengthLowerBound());
-    assertEquals(1, c1.varLengthUpperBound());
-  }
-
-  public void testBounds1() throws Exception{
-    Hampi h = new Hampi();
-    Regexp b = h.constRegexp("b");
-    Regexp ab = h.constRegexp("ab");
-
-    Expression v = h.varExpr("v");
-    Constraint c1 = h.regexpConstraint(v, true, h.orRegexp(b, ab)); //v in b+ab
-
-    System.out.println(c1);
-    assertEquals(1, c1.varLengthLowerBound());
-    assertEquals(2, c1.varLengthUpperBound());
-  }
-
-  public void testBounds2() throws Exception{
-    Hampi h = new Hampi();
-    Regexp b = h.constRegexp("b");
-    Regexp ab = h.constRegexp("ab");
-
-    Expression v = h.varExpr("v");
-    Expression a = h.constExpr("a");
-    Constraint c1 = h.regexpConstraint(v, true, h.orRegexp(b, ab)); //v in b+ab
-    Constraint c2 = h.regexpConstraint(h.concatExpr(a, v), true, ab); //a v in a b
-
-    Constraint c = h.andConstraint(c1, c2);
-    System.out.println(c);
-    assertEquals(1, c.varLengthLowerBound());
-    assertEquals(1, c.varLengthUpperBound());
-  }
-
-  public void testInconsistentBounds() throws Exception{
-    Hampi h = new Hampi();
-    Regexp b = h.constRegexp("b");
-    Regexp ab = h.constRegexp("ab");
-    Regexp abba = h.constRegexp("abba");
-
-    Expression v = h.varExpr("v");
-    Expression a = h.constExpr("a");
-    Constraint c1 = h.regexpConstraint(v, true, h.orRegexp(b, ab)); //v in b+ab
-    Constraint c2 = h.regexpConstraint(h.concatExpr(a, v), true, abba); //a v in abba
-
-    Constraint c = h.andConstraint(c1, c2);
-    System.out.println(c);
-    assertEquals(3, c.varLengthLowerBound());
-    assertEquals(2, c.varLengthUpperBound());
-    for (Solution sol : solve(h, c, 1)){
-      assertTrue(!sol.isSatisfiable());
-    }
-  }
 
   public void testMultiConstraints() throws Exception{
     Hampi h = new Hampi();
@@ -966,11 +878,45 @@ public class SolverTests extends TestCase{
       assertEquals("xx??", solution.getValue(v));
     }
   }
+/**
+ * var a:6;
+val compose := concat("a",a,"b",a);
+assert compose contains "aaabaa";
+ */
+  public void testMultipleOccurencesOFVariableInConcat() throws Exception{
+    Hampi h = new Hampi();
+    VariableExpression a = h.varExpr("a");
+    Expression compose = h.concatExpr(h.constExpr("a"), a, h.constExpr("b"), a);
+
+    Constraint c = h.regexpConstraint(compose, true, h.constRegexp("aaabaa"));
+
+    for (Solution solution : solve(h, c, 2)){
+      assertTrue(solution.isSatisfiable());
+      assertEquals("aa", solution.getValue(a));
+    }
+  }
+  /**
+   * var v:4; val prefix := v[0:2]; val compose := concat("a",prefix,"b",v,"c");
+   * assert prefix in "xx"; assert compose in "axxbxxppc"; //expecting xxpp
+   */
+  public void testSubsequenceAndVarInSameConcat2() throws Exception{
+    Hampi h = new Hampi();
+    VariableExpression v = h.varExpr("v");
+    Expression prefix = h.subsequenceExpr(v, 0, 2);
+    Expression compose = h.concatExpr(h.constExpr("a"), prefix, h.constExpr("b"), v, h.constExpr("c"));
+
+    Constraint c1 = h.regexpConstraint(prefix, true, h.constRegexp("xx"));
+    Constraint c2 = h.regexpConstraint(compose, true, h.constRegexp("axxbxxppc"));
+    Constraint c = h.andConstraint(c1, c2);
+
+    for (Solution solution : solve(h, c, 4)){
+      assertTrue(solution.isSatisfiable());
+      assertEquals("xxpp", solution.getValue(v));
+    }
+  }
 
   /**
-   * var v:2;
-   * assert v in "xx";
-   * //expecting xx
+   * var v:2; assert v in "xx"; //expecting xx
    */
   public void testVarInConstantRegExp() throws Exception{
     Hampi h = new Hampi();

@@ -93,7 +93,7 @@ public final class RegexpConstraint extends Constraint{
   public Set<VariableExpression> getVariables(){
     return expr.getVariables();
   }
-  
+
   @Override
   public Set<SubsequenceExpression> getSubsequenceVals(){
     return expr.getSubsequenceVals();
@@ -120,25 +120,15 @@ public final class RegexpConstraint extends Constraint{
   }
 
   @Override
-  public int varLengthUpperBound(){
-    if (!isMembership())
-      return Integer.MAX_VALUE;
-    int maxRegexpLength = getRegexp().getSizeUpperBound();
-    int maxExprLength = getExpression().getSizeLowerBound();
-    return Math.max(0, maxRegexpLength - maxExprLength);
-  }
-
-  @Override
-  public int varLengthLowerBound(){
-    if (!isMembership())
-      return 0;//TODO make better
-    int minRegexLength = getRegexp().getSizeLowerBound();
-    int minExprLength = getExpression().getSizeLowerBound();
-    return Math.max(0, minRegexLength - minExprLength);//XXX only works if var appears just once in expr
-  }
-
-  @Override
   public Set<Character> alphabetLowerbound(){
     return getRegexp().getAlphabetLowerbound();
+  }
+
+  @Override
+  public boolean isLegal(int varSize){
+    if (!isMembership())
+      return true;
+    int expressionSize = getExpression().getSize(varSize);
+    return getRegexp().getSizeUpperBound() >= expressionSize && getRegexp().getSizeLowerBound() <= expressionSize;
   }
 }

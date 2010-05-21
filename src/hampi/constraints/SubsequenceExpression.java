@@ -25,16 +25,6 @@ public class SubsequenceExpression extends Expression{
   }
 
   @Override
-  public int getSizeLowerBound(){
-    return getSizeUpperBound();
-  }
-
-  @Override
-  public int getSizeUpperBound(){
-    return len;
-  }
-
-  @Override
   public String getValue(Solution solution){
     return expr.getValue(solution).substring(fromIndex, fromIndex + len);
   }
@@ -80,6 +70,11 @@ public class SubsequenceExpression extends Expression{
 
   public boolean isValid(int size){
     return len + fromIndex <= size;
+  }
+
+  @Override
+  public int getSize(int varSize){
+    return len;
   }
 
 }

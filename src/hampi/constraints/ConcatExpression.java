@@ -122,30 +122,12 @@ public final class ConcatExpression extends Expression{
   }
 
   @Override
-  public int getSizeLowerBound(){
+  public int getSize(int varSize){
     int sum = 0;
     for (Expression e : subexpressions){
-      int low = e.getSizeLowerBound();
-      if (low == Integer.MAX_VALUE)
-        return low; //not going to get any larger so just return
-      else{
-        sum += low;
-      }
+      sum += e.getSize(varSize);
     }
     return sum;
   }
 
-  @Override
-  public int getSizeUpperBound(){
-    int sum = 0;
-    for (Expression e : subexpressions){
-      int high = e.getSizeUpperBound();
-      if (high == Integer.MAX_VALUE)
-        return high;//not going to get any larger so just return
-      else{
-        sum += high;
-      }
-    }
-    return sum;
-  }
 }

@@ -57,40 +57,33 @@ public class STPSolver extends AbstractSolver{
       if (constraint.getConjuncts().isEmpty())
         return Solution.createSAT();
 
-      Solution simpleSolution = trySimpleCases(constraint);
-      if (simpleSolution != null)
-        return simpleSolution;
+      if (constraint.getVariables().size() == 0)
+        throw new UnsupportedOperationException("Must supply at least one variable");
 
-      if (constraint.getVariables().size() != 1)
+      if (constraint.getVariables().size() > 1)
         throw new UnsupportedOperationException("multi-variable constraints are not supported yet");
-
-      int min = constraint.varLengthLowerBound();
-
-      if (size < min || !isValidSubsequencesLength(constraint, size))
-        return Solution.createUNSAT(); //cut this short
 
       VariableExpression v = constraint.getVariables().iterator().next();
       Constraint c = addVarInSigmaStarConstraint(constraint, v);
 
-      if (size == 0 && min == 0){//try empty string without calling STP
+      if (!isValidSubsequencesLength(constraint, size))
+        return Solution.createUNSAT(); //cut this short
+
+      if (size == 0){//try empty string without calling STP
         Solution emptyStringSol = Solution.createSAT();
         emptyStringSol.setValue(v, "");
         boolean checkSolution = new SolutionChecker().checkSolution(c, emptyStringSol);
         if (checkSolution)
           return emptyStringSol;
-        else{
-          min = 1;
-        }
       }
 
-      int upperBound = c.varLengthUpperBound();
-      if (upperBound < min)
-        return Solution.createUNSAT(); //cut this short
-
       int varlength = size;
+      if (!constraint.isLegal(varlength))
+        return Solution.createUNSAT();
       if (verbose){
         System.out.println("length:" + varlength);
       }
+
       createTimer.start();
 
       encoding = new CharacterEncoding();
@@ -195,7 +188,7 @@ public class STPSolver extends AbstractSolver{
   private int getBVLength(int varlength, RegexpConstraint c){
     Set<VariableExpression> vars = c.getVariables();
     if (vars.isEmpty())
-      return c.getExpression().getSizeLowerBound();
+      return c.getExpression().getSize(0);
     Solution s = Solution.createSAT();
     String val = Utils.repeat(varlength, 'a');
     s.setValue(vars.iterator().next(), val);

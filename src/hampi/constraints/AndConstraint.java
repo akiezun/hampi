@@ -125,24 +125,6 @@ public final class AndConstraint extends Constraint{
   }
 
   @Override
-  public int varLengthUpperBound(){
-    int min = Integer.MAX_VALUE;
-    for (Constraint conjunct : getConjuncts()){
-      min = Math.min(min, conjunct.varLengthUpperBound());
-    }
-    return min;
-  }
-
-  @Override
-  public int varLengthLowerBound(){
-    int max = 0;
-    for (Constraint conjunct : getConjuncts()){
-      max = Math.max(max, conjunct.varLengthLowerBound());
-    }
-    return max;
-  }
-
-  @Override
   public Set<Character> alphabetLowerbound(){
     Set<Character> result = new LinkedHashSet<Character>();
     for (Constraint conjunct : getConjuncts()){
@@ -150,4 +132,14 @@ public final class AndConstraint extends Constraint{
     }
     return result;
   }
+
+  @Override
+  public boolean isLegal(int varSize){
+    for (Constraint conjunct : getConjuncts()){
+      if (!conjunct.isLegal(varSize))
+        return false;
+    }
+    return true;
+  }
+
 }

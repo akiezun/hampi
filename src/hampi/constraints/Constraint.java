@@ -110,23 +110,11 @@ public abstract class Constraint{
   }
 
   /**
-   * Upper bound on the length of the variable in a satisfying assignment. For
-   * regexp, it returns a upper bound of the regexpr and for conjunctions, it's
-   * a min of upper bounds for conjuncts.
-   */
-  public abstract int varLengthUpperBound();
-
-  /**
-   * Lower bound on the length of the variable in a satisfying assignment. For
-   * regexp, it returns a lower bound of the regexpr. For conjunctions, it
-   * returns a max of lower bounds for conjuncts.
-   */
-  public abstract int varLengthLowerBound();
-
-  /**
    * Returns the set of characters that must appear in every string that
    * satisfies the constraint.
    */
   public abstract Set<Character> alphabetLowerbound();
+
+  public abstract boolean isLegal(int varSize);
 
 }
