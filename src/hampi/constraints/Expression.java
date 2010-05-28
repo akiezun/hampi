@@ -25,7 +25,7 @@ package hampi.constraints;
 
 import hampi.Solution;
 
-import java.util.Set;
+import java.util.*;
 
 /**
  * Represents an expression used in the constraints.
@@ -81,4 +81,16 @@ public abstract class Expression{
    * length varLength
    */
   public abstract int getSize(int varLength);
+
+  /**
+   * Returns the offset of the variable (in terms of chars).
+   *
+   */
+  public abstract List<Integer> getVarOffSets(int varLen);
+
+  /**
+   * Returns the offset of the subsequence value (in terms of chars).
+   *
+   */
+  public abstract List<Integer> getSubsequenceOffSets(SubsequenceExpression val, int varLen);
 }

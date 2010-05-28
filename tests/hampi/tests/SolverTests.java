@@ -916,6 +916,51 @@ assert compose contains "aaabaa";
   }
 
   /**
+   * var v:9;
+   * val vSub1 := v[0:3]; //substring of v (offset 2, length 3)
+   * val vSub2 := v[3:3];
+   * val vSub3 := v[6:3];
+   * val vSub4 := v[2:2];
+   * val c     := "deg";
+   * reg sigmaStar := star(['a'-'z']);
+   * reg r         := concat('b',sigmaStar);
+   * assert vSub1 contains "de";
+   * assert vSub2 contains "ef";
+   * assert vSub1 equals c;
+   * assert vSub1 not equals vSub4;
+   * assert vSub4 not equals c;
+   * assert v not equals c;
+   * assert vSub3 in r;
+   * assert vSub3 equals vSub2;
+   */
+  public void testEqualsAndNotEquals() throws Exception{
+    Hampi h = new Hampi();
+    VariableExpression v = h.varExpr("v");
+    Expression vSub1 = h.subsequenceExpr(v, 0, 3);
+    Expression vSub2 = h.subsequenceExpr(v, 3, 3);
+    Expression vSub3 = h.subsequenceExpr(v, 6, 3);
+    Expression vSub4 = h.subsequenceExpr(v, 2, 2);
+    Expression c = h.constExpr("deg");
+    Regexp sigma_star = h.starRegexp(h.rangeRegexp((char) 0, (char) 255));
+    Regexp r = h.concatRegexp(h.constRegexp("b"), sigma_star);
+
+    Constraint c1 = h.regexpConstraint(vSub1, true, h.concatRegexp(sigma_star, h.constRegexp("de"), sigma_star));
+    Constraint c2 = h.regexpConstraint(vSub2, true, h.concatRegexp(sigma_star, h.constRegexp("ef"), sigma_star));
+    Constraint c3 = h.equalsConstraint(vSub1, true, c);
+    Constraint c4 = h.equalsConstraint(vSub1, false, vSub4);
+    Constraint c5 = h.equalsConstraint(vSub4, false, c);
+    Constraint c6 = h.equalsConstraint(v, false, c);
+    Constraint c7 = h.regexpConstraint(vSub3, true, r);
+    Constraint c8 = h.equalsConstraint(vSub3, true, vSub2);
+    Constraint constraint = h.andConstraint(c1, c2, c3, c4, c5, c6, c7, c8);
+
+    for (Solution solution : solve(h, constraint, 9)){
+      assertTrue(solution.isSatisfiable());
+      assertEquals("degbefbef", solution.getValue(v));
+    }
+  }
+
+  /**
    * var v:2; assert v in "xx"; //expecting xx
    */
   public void testVarInConstantRegExp() throws Exception{

@@ -59,7 +59,38 @@ public abstract class Constraint{
    * conjuction, then it returns all sub-expressions, otherwise it returns a
    * singleton set.
    */
-  public abstract List<RegexpConstraint> getConjuncts();
+  public abstract List<Constraint> getConjuncts();
+
+  /**
+   * Returns all regular expression conjuncts in this expression. If this expression is a
+   * conjuction, then it returns all sub-regular expressions, otherwise it returns a
+   * singleton set.
+   */
+  public List<RegexpConstraint> getRegExpConjuncts(){
+    List<RegexpConstraint> result = new ArrayList<RegexpConstraint>();
+    for (Constraint c : getConjuncts()){
+      if (c instanceof RegexpConstraint){
+        result.add((RegexpConstraint) c);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Returns all equals expression conjuncts in this expression. If this
+   * expression is a conjuction, then it returns all sub-equal expressions,
+   * otherwise it returns a singleton set.
+   */
+  public List<EqualsConstraint> getEqualsConjuncts(){
+    List<EqualsConstraint> result = new ArrayList<EqualsConstraint>();
+    for (Constraint c : getConjuncts()){
+      if (c instanceof EqualsConstraint){
+        result.add((EqualsConstraint) c);
+      }
+    }
+    return result;
+  }
+
 
   /**
    * Returns the set of all free variables mentioned in this constraint.
@@ -116,5 +147,12 @@ public abstract class Constraint{
   public abstract Set<Character> alphabetLowerbound();
 
   public abstract boolean isLegal(int varSize);
+
+  /**
+   * Remove all equality constraints that are of different length as they are
+   * satisfied by default
+   *
+   */
+  public abstract void removeUnequalSizeEqualities(int varLength);
 
 }

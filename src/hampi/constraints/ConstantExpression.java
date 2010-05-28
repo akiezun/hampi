@@ -91,4 +91,14 @@ public final class ConstantExpression extends Expression{
     return str.length();
   }
 
+  @Override
+  public List<Integer> getVarOffSets(int varLen){
+    return Collections.emptyList();
+  }
+
+  @Override
+  public List<Integer> getSubsequenceOffSets(SubsequenceExpression sub, int varLen){
+    return Collections.emptyList();
+  }
+
 }

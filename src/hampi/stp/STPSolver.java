@@ -65,8 +65,8 @@ public class STPSolver extends AbstractSolver{
 
       VariableExpression v = constraint.getVariables().iterator().next();
       Constraint c = addVarInSigmaStarConstraint(constraint, v);
-
-      if (!isValidSubsequencesLength(constraint, size))
+      c.removeUnequalSizeEqualities(size);
+      if (!isValidSubsequencesLength(constraint, size) || !isValidEqualityLength(constraint.getEqualsConjuncts(), size))
         return Solution.createUNSAT(); //cut this short
 
       if (size == 0){//try empty string without calling STP
@@ -88,27 +88,24 @@ public class STPSolver extends AbstractSolver{
 
       encoding = new CharacterEncoding();
 
-      List<STPExpr> expressions = new ArrayList<STPExpr>(c.getConjuncts().size());
-      BVExpr[] bvs = new BVExpr[c.getConjuncts().size()];
-      int[] bvLens = new int[c.getConjuncts().size()];
-      int count = 0;
-      for (RegexpConstraint conjunct : c.getConjuncts()){
-        RegexpConstraint rc = conjunct;
-        int bvLength = getBVLength(varlength, rc);
+      List<RegexpConstraint> regExpConjuncts = c.getRegExpConjuncts();
+      List<EqualsConstraint> equalsConjuncts = c.getEqualsConjuncts();
 
-        BVExpr bv = BVExpr.create(this, "bv" + count, encodingSize() * bvLength);
-        bvs[count] = bv;
-        bvLens[count] = bvLength;
-        count++;
+      List<STPExpr> expressions = new ArrayList<STPExpr>(equalsConjuncts.size() + regExpConjuncts.size());
 
-        STPExpr e = createRegexpConstraint(bv, rc, bvLength, varlength);
-        expressions.add(e);
-        if (e.equals(falseExpr()))
-          return Solution.createUNSAT();
-      }
+      BVExpr[] regularExpressionBvs = new BVExpr[regExpConjuncts.size()];
+      int[] regularExpressionBvLens = new int[regExpConjuncts.size()];
+      if (!makeBitVectorsForRegularExpressions(regExpConjuncts, varlength, expressions, regularExpressionBvs, regularExpressionBvLens))
+        return Solution.createUNSAT();
+
+      BVExpr[] equalsBvs = new BVExpr[2 * equalsConjuncts.size()];
+      int[] equalsBvLens = new int[2 * equalsConjuncts.size()];
+      if (!makeBitVectorsForEqualsExpressions(equalsConjuncts, varlength, expressions, equalsBvs, equalsBvLens, regularExpressionBvs.length))
+        return Solution.createUNSAT();
+
       STPExpr stpFormula = AndExpr.create(this, expressions);
-      STPExpr stpVarFormula = AndExpr.create(this, stpFormula, linkVars(c.getConjuncts(), bvs, bvLens, varlength));
-      STPExpr fullFormula = AndExpr.create(this, stpVarFormula, linkSubsequenceVars(c.getConjuncts(), bvs, bvLens, varlength));
+      STPExpr stpVarFormula = AndExpr.create(this, stpFormula, linkVars(regExpConjuncts, regularExpressionBvs, equalsConjuncts, equalsBvs, varlength));
+      STPExpr fullFormula = AndExpr.create(this, stpVarFormula, linkSubsequenceVals(regExpConjuncts, regularExpressionBvs, equalsConjuncts, equalsBvs, varlength));
       createTimer.stop();
       List<STPExpr> alternatives;
       if (OPT_TOP_DISJ_SPLIT && fullFormula.getKind() == STPExprKind.OrExpr){
@@ -141,7 +138,7 @@ public class STPSolver extends AbstractSolver{
           //          System.out.println("Solving STP " + (query == 0) + "\n------------------------");
           if (query == 0){
             Solution sat = Solution.createSAT();
-            String decodedValue = decodeValue(sc, c.getConjuncts(), bvs, varlength);
+            String decodedValue = decodeValue(sc, regularExpressionBvs);
             if (decodedValue != null){
               sat.setValue(v, decodedValue);
             }
@@ -167,6 +164,58 @@ public class STPSolver extends AbstractSolver{
     }
   }
 
+  //Check that the size of equality expressions are the same
+  private boolean isValidEqualityLength(List<EqualsConstraint> equalsConjuncts, int varLength){
+    for (EqualsConstraint ec : equalsConjuncts){
+      if (ec.isEqual() && ec.getExpression1().getSize(varLength) != ec.getExpression2().getSize(varLength))
+        return false;
+    }
+    return true;
+  }
+
+  private boolean makeBitVectorsForEqualsExpressions(List<EqualsConstraint> equalsConjuncts, int varlength, List<STPExpr> expressions, BVExpr[] equalsBvs, int[] equalsBvLens,
+      int numOfPreviouslyGeneratedVectors){
+    int count = 0;
+    for (EqualsConstraint ec : equalsConjuncts){
+      int bv1Length = getBVLength(varlength, ec.getExpression1());
+      int bv2Length = getBVLength(varlength, ec.getExpression2());
+
+      BVExpr bv1 = BVExpr.create(this, "bv" + (count + numOfPreviouslyGeneratedVectors), encodingSize() * bv1Length);
+      equalsBvs[count] = bv1;
+      equalsBvLens[count] = bv1Length;
+      count++;
+      BVExpr bv2 = BVExpr.create(this, "bv" + (count + numOfPreviouslyGeneratedVectors), encodingSize() * bv2Length);
+      equalsBvs[count] = bv2;
+      equalsBvLens[count] = bv2Length;
+      count++;
+
+      STPExpr e = createEqualsConstraint(bv1, bv1Length, bv2, bv2Length, ec, varlength);
+      expressions.add(e);
+      if (e.equals(falseExpr()))
+        return false;
+    }
+    return true;
+  }
+
+
+  private boolean makeBitVectorsForRegularExpressions(List<RegexpConstraint> regExpConjuncts, int varlength, List<STPExpr> expressions, BVExpr[] bvs, int[] bvLens){
+    int count = 0;
+    for (RegexpConstraint rc : regExpConjuncts){
+      int bvLength = getBVLength(varlength, rc.getExpression());
+
+      BVExpr bv = BVExpr.create(this, "bv" + count, encodingSize() * bvLength);
+      bvs[count] = bv;
+      bvLens[count] = bvLength;
+      count++;
+
+      STPExpr e = createRegexpConstraint(bv, rc, bvLength, varlength);
+      expressions.add(e);
+      if (e.equals(falseExpr()))
+        return false;
+    }
+    return true;
+  }
+
   /**
    * Adding a constraint that the variable is in the sigma^star. This ensures
    * that there is always a constraint on the original variable (and not only on
@@ -185,105 +234,163 @@ public class STPSolver extends AbstractSolver{
   /**
    * Returns the size of bitvector (in chars) given the size of var (in chars)
    */
-  private int getBVLength(int varlength, RegexpConstraint c){
-    Set<VariableExpression> vars = c.getVariables();
+  private int getBVLength(int varlength, Expression e){
+    Set<VariableExpression> vars = e.getVariables();
     if (vars.isEmpty())
-      return c.getExpression().getSize(0);
+      return e.getSize(0);
     Solution s = Solution.createSAT();
     String val = Utils.repeat(varlength, 'a');
     s.setValue(vars.iterator().next(), val);
-    return c.getExpression().getValue(s).length();
+    return e.getValue(s).length();
   }
 
   /**
    * Returns the solved value for the variable.
    */
-  private String decodeValue(SolvingContext sc, List<RegexpConstraint> conjuncts, BVExpr[] bvs, int varLen){
+  private String decodeValue(SolvingContext sc, BVExpr[] bvs){
     //The first constraint asserts that the variable is in sigma*
     //and thus it can be used to decode the result
     return encoding.decodeValue(sc.getVC(), bvs[0].getExpr(sc, 0));
   }
 
   /**
-   * Returns the offset and length of the variable (in terms of chars).
-   *
+   * Creates an expression that means: the parts of bitvectors that denote the
+   * variable are all equal.
    */
-  private List<Integer> varOffset(RegexpConstraint c, int bvLen, int varLen){
-    List<Integer> offsets = new ArrayList<Integer>();
-    Expression expr = c.getExpression();
-    if (expr.getKind() == ElementKind.CONCAT_EXPRESSION){
-      ConcatExpression ce = (ConcatExpression) expr;
-      List<Expression> subs = ce.getSubexpressions();
-      int constLen = 0;
-      for (Expression sub : subs){
-        if (sub.getKind() == ElementKind.CONST_EXPRESSION){
-          ConstantExpression constExpr = (ConstantExpression) sub;
-          String str = constExpr.getString();
-          constLen += str.length();
-        }
-        if (sub.getKind() == ElementKind.VAR_EXPRESSION){
-          offsets.add(constLen);
-          constLen += varLen;
-        }
-        if (sub.getKind() == ElementKind.SUBSEQUENCE_EXPRESSION){
-          constLen += ((SubsequenceExpression) sub).getLength();
-        }
-        if (sub.getKind() == ElementKind.CONCAT_EXPRESSION)
-          throw new IllegalArgumentException("should not have nested concats: " + c);
-      }
-    }else if (expr.getKind() == ElementKind.VAR_EXPRESSION){
-      offsets.add(0);
-    }else if (expr.getKind() == ElementKind.SUBSEQUENCE_EXPRESSION){
-      //Nothing since we don't care about the starting index of subsequence
-    }else
-      throw new IllegalStateException("unexpected constraint " + c);
-    return offsets;
+  private STPExpr linkVars(List<RegexpConstraint> regExpConjuncts, BVExpr[] regularExpressionBvs, List<EqualsConstraint> equalsConjuncts, BVExpr[] equalsBvs, int varlength){
+    if (regularExpressionBvs.length + equalsBvs.length == 0)
+      return trueExpr();
+    List<STPExpr> expressions = extractVariableFromRegExp(regExpConjuncts, regularExpressionBvs, varlength);
+    expressions.addAll(extractVariableFromEqualConstraint(equalsConjuncts, equalsBvs, varlength));
+    return allEqual(expressions);
   }
+
+  /**
+   * Creates an expression that means: the parts of bitvectors that denote each
+   * subsequence is equal to the appropriate part of the original variable
+   */
+  private STPExpr linkSubsequenceVals(List<RegexpConstraint> regExpConjuncts, BVExpr[] regularExpressionBvs, List<EqualsConstraint> equalsConjuncts, BVExpr[] equalsBvs, int varlength){
+    if (regularExpressionBvs.length + equalsBvs.length == 0)
+      return trueExpr();
+    Set<SubsequenceExpression> subsequences = getSubsequences(regExpConjuncts, equalsConjuncts);
+    List<STPExpr> valEqualExpressions = new ArrayList<STPExpr>();
+    for (SubsequenceExpression val : subsequences){
+      valEqualExpressions.add(linkSubsequenceVal(regExpConjuncts, regularExpressionBvs, equalsConjuncts, equalsBvs, val, varlength));
+    }
+    return and(valEqualExpressions);
+  }
+
 
   /**
    * Creates an expression that means: the parts of bitvectors that denote the
    * variable are all equal.
    */
-  private STPExpr linkVars(List<RegexpConstraint> conjuncts, BVExpr[] bvs, int bvLens[], int varLen){
-    if (bvs.length == 0)
+  private STPExpr linkSubsequenceVal(List<RegexpConstraint> regExpConjuncts, BVExpr[] regularExpressionBvs, List<EqualsConstraint> equalsConjuncts, BVExpr[] equalsBvs, SubsequenceExpression val,
+      int varLength){
+    if (regularExpressionBvs.length + equalsBvs.length == 0)
       return trueExpr();
-    List<STPExpr> expressions = new ArrayList<STPExpr>(conjuncts.size());
-    for (int i = 0; i < conjuncts.size(); i++){
-      RegexpConstraint c = conjuncts.get(i);
-
-      List<Integer> varOffsets = varOffset(c, bvLens[i], varLen);
-      for (int varOffset : varOffsets){
-        int enc = encodingSize();
-        STPExpr encoded = bvs[i].extract(enc * (varOffset + varLen) - 1, enc * varOffset, enc);
-        expressions.add(encoded);
-      }
-    }
+    List<STPExpr> expressions = extractValFromRegExp(regExpConjuncts, regularExpressionBvs, val, varLength);
+    expressions.addAll(extractValFromEqualConstraint(equalsConjuncts, equalsBvs, val, varLength));
+    int enc = encodingSize();
+    //adding the position of the subsequence in the bit vector for the variable
+    expressions.add(regularExpressionBvs[0].extract(enc * (val.getStartIndex() + val.getLength()) - 1, enc * val.getStartIndex(), enc));
     return allEqual(expressions);
   }
 
-  /**
-   * Creates an expression that means: each subsequence is equal to the
-   * appropriate part of the original variable
-   */
-  private STPExpr linkSubsequenceVars(List<RegexpConstraint> conjuncts, BVExpr[] bvs, int[] bvLens, int varlength){
-    if (bvs.length == 0)
-      return trueExpr();
-    Map<SubsequenceExpression, List<Pair<Integer, Integer>>> subsequencesOffsets = subsequenceValOffsets(conjuncts, varlength);
-    List<STPExpr> valEqualExpressions = new ArrayList<STPExpr>(conjuncts.size());
-    for (SubsequenceExpression subsequence : subsequencesOffsets.keySet()){
-      List<Pair<Integer, Integer>> subsequenceOffsets = subsequencesOffsets.get(subsequence);
-      List<STPExpr> valExpressions = new ArrayList<STPExpr>(conjuncts.size());
-      for (Pair<Integer, Integer> subsequenceOffset : subsequenceOffsets){
+  private List<STPExpr> extractVariableFromEqualConstraint(List<EqualsConstraint> equalsConjuncts, BVExpr[] equalsBvs, int varlength){
+    List<STPExpr> expressions = new ArrayList<STPExpr>(2*equalsConjuncts.size());
+    for (int i = 0; i < equalsConjuncts.size(); i++){
+      Expression e1 = equalsConjuncts.get(i).getExpression1();
+      List<Integer> offsets = e1.getVarOffSets(varlength);
+      for (int offset : offsets){
         int enc = encodingSize();
-        STPExpr encoded = bvs[subsequenceOffset.first].extract(enc * (subsequenceOffset.second + subsequence.getLength()) - 1, enc * subsequenceOffset.second, enc);
-        valExpressions.add(encoded);
+        STPExpr encoded = equalsBvs[2 * i].extract(enc * (offset + varlength) - 1, enc * offset, enc);
+        expressions.add(encoded);
       }
-      int enc = encodingSize();
-      //adding the position of the subsequence in the bit vector for the variable
-      valExpressions.add(bvs[0].extract(enc * (subsequence.getStartIndex() + subsequence.getLength()) - 1, enc * subsequence.getStartIndex(), enc));
-      valEqualExpressions.add(allEqual(valExpressions));
+      Expression e2 = equalsConjuncts.get(i).getExpression2();
+      offsets = e2.getVarOffSets(varlength);
+      for (int offset : offsets){
+        int enc = encodingSize();
+        STPExpr encoded = equalsBvs[2 * i + 1].extract(enc * (offset + varlength) - 1, enc * offset, enc);
+        expressions.add(encoded);
+      }
     }
-    return and(valEqualExpressions);
+    return expressions;
+  }
+
+  private List<STPExpr> extractValFromEqualConstraint(List<EqualsConstraint> equalsConjuncts, BVExpr[] equalsBvs, SubsequenceExpression val, int varlength){
+    List<STPExpr> expressions = new ArrayList<STPExpr>();
+    for (int i = 0; i < equalsConjuncts.size(); i++){
+      Expression e1 = equalsConjuncts.get(i).getExpression1();
+      List<Integer> offsets = e1.getSubsequenceOffSets(val, varlength);
+      for (int offset : offsets){
+        int enc = encodingSize();
+        STPExpr encoded = equalsBvs[2 * i].extract(enc * (offset + val.getLength()) - 1, enc * offset, enc);
+        expressions.add(encoded);
+      }
+      Expression e2 = equalsConjuncts.get(i).getExpression2();
+      offsets = e2.getSubsequenceOffSets(val, varlength);
+      for (int offset : offsets){
+        int enc = encodingSize();
+        STPExpr encoded = equalsBvs[2 * i + 1].extract(enc * (offset + val.getLength()) - 1, enc * offset, enc);
+        expressions.add(encoded);
+      }
+    }
+    return expressions;
+  }
+
+  private List<STPExpr> extractVariableFromRegExp(List<RegexpConstraint> regExpConjuncts, BVExpr[] regularExpressionBvs, int varlength){
+    List<STPExpr> expressions = new ArrayList<STPExpr>(regExpConjuncts.size());
+    for (int i = 0; i < regExpConjuncts.size(); i++){
+      Expression e = regExpConjuncts.get(i).getExpression();
+
+      List<Integer> offSets = e.getVarOffSets(varlength);
+      for (int offset : offSets){
+        int enc = encodingSize();
+        STPExpr encoded = regularExpressionBvs[i].extract(enc * (offset + varlength) - 1, enc * offset, enc);
+        expressions.add(encoded);
+      }
+    }
+    return expressions;
+  }
+
+  private List<STPExpr> extractValFromRegExp(List<RegexpConstraint> regExpConjuncts, BVExpr[] regularExpressionBvs, SubsequenceExpression val, int varlength){
+    List<STPExpr> expressions = new ArrayList<STPExpr>(regExpConjuncts.size());
+    for (int i = 0; i < regExpConjuncts.size(); i++){
+      Expression e = regExpConjuncts.get(i).getExpression();
+
+      List<Integer> offsets = e.getSubsequenceOffSets(val, varlength);
+      for (int offset : offsets){
+        int enc = encodingSize();
+        STPExpr encoded = regularExpressionBvs[i].extract(enc * (offset + val.getLength()) - 1, enc * offset, enc);
+        expressions.add(encoded);
+      }
+    }
+    return expressions;
+  }
+
+
+  private Set<SubsequenceExpression> getSubsequences(List<RegexpConstraint> regExpConjuncts, List<EqualsConstraint> equalsConjuncts){
+    Set<SubsequenceExpression> result = new LinkedHashSet<SubsequenceExpression>();
+    for(Expression e:getExpressions(regExpConjuncts, equalsConjuncts)) {
+      if (e instanceof SubsequenceExpression){
+        result.add((SubsequenceExpression)e);
+      }
+    }
+    return result;
+  }
+
+
+  private Set<Expression> getExpressions(List<RegexpConstraint> regExpConjuncts, List<EqualsConstraint> equalsConjuncts){
+    Set<Expression> result = new LinkedHashSet<Expression>();
+    for (RegexpConstraint rc : regExpConjuncts){
+      result.add(rc.getExpression());
+    }
+    for (EqualsConstraint ec : equalsConjuncts){
+      result.add(ec.getExpression1());
+      result.add(ec.getExpression2());
+    }
+    return result;
   }
 
   private STPExpr and(List<STPExpr> expressions){
@@ -295,57 +402,6 @@ public class STPSolver extends AbstractSolver{
     }
     return result;
   }
-
-  /**
-   * Returns the offset of the each subsequence val in all bit vectors.
-   *
-   */
-  private Map<SubsequenceExpression, List<Pair<Integer, Integer>>> subsequenceValOffsets(List<RegexpConstraint> conjuncts, int varlength){
-    Map<SubsequenceExpression,List<Pair<Integer, Integer>>> result = new LinkedHashMap<SubsequenceExpression,List<Pair<Integer, Integer>>>();
-    for (int i = 0; i < conjuncts.size(); i++){
-      RegexpConstraint c = conjuncts.get(i);
-      Expression expr = c.getExpression();
-      if (expr.getKind() == ElementKind.CONCAT_EXPRESSION){
-        ConcatExpression ce = (ConcatExpression) expr;
-        List<Expression> subs = ce.getSubexpressions();
-        int constLen = 0;
-        for (Expression sub : subs){
-          if (sub.getKind() == ElementKind.CONST_EXPRESSION){
-            ConstantExpression constExpr = (ConstantExpression) sub;
-            String str = constExpr.getString();
-            constLen += str.length();
-          }
-          if (sub.getKind() == ElementKind.VAR_EXPRESSION){
-            constLen += varlength;
-          }
-          if (sub.getKind() == ElementKind.SUBSEQUENCE_EXPRESSION){
-            SubsequenceExpression subsequenceExpr = (SubsequenceExpression) sub;
-            List<Pair<Integer, Integer>> offsets = result.get(subsequenceExpr);
-            if(offsets==null){
-              offsets = new ArrayList<Pair<Integer, Integer>>();
-            }
-            offsets.add(Pair.create(i, constLen));
-            result.put(subsequenceExpr, offsets);
-            constLen += subsequenceExpr.getLength();
-          }
-          if (sub.getKind() == ElementKind.CONCAT_EXPRESSION)
-            throw new IllegalArgumentException("should not have nested concats: " + c);
-        }
-      }else if (expr.getKind() == ElementKind.SUBSEQUENCE_EXPRESSION){
-        SubsequenceExpression subsequenceExpr = (SubsequenceExpression) expr;
-        List<Pair<Integer, Integer>> offsets = result.get(subsequenceExpr);
-        if (offsets == null){
-          offsets = new ArrayList<Pair<Integer, Integer>>();
-        }
-        offsets.add(Pair.create(i, 0));
-        result.put(subsequenceExpr, offsets);
-      }
-    }
-    return result;
-  }
-
-
-
 
   /**
    * Returns the number of bits per character in the encoding.
@@ -369,6 +425,66 @@ public class STPSolver extends AbstractSolver{
       }
     }
     return result;
+  }
+
+  private STPExpr createEqualsConstraint(BVExpr bv1, int bv1Length, BVExpr bv2, int bv2Length, EqualsConstraint ec, int varlength){
+    Expression expr1 = ec.getExpression1();
+    Expression expr2 = ec.getExpression2();
+    int enc = encodingSize();
+    //adding the position of the subsequence in the bit vector for the variable
+    ;
+    STPExpr equalityExpr = bv1.extract(enc * bv1Length - 1, enc * 0, enc).binOp(BinOpKind.EQ_OP, bv2.extract(enc * bv2Length - 1, enc * 0, enc));
+    equalityExpr = ec.isEqual() ? equalityExpr : NotExpr.create(equalityExpr, this);
+    equalityExpr = AndExpr.create(this, equalityExpr, getExpressionSTP(bv1, expr1, varlength));
+    equalityExpr = AndExpr.create(this, equalityExpr, getExpressionSTP(bv2, expr2, varlength));
+
+    return equalityExpr;
+  }
+
+  private STPExpr getExpressionSTP(BVExpr bv, Expression expr, int varLen){
+    if (expr.getKind() == ElementKind.VAR_EXPRESSION || expr.getKind() == ElementKind.SUBSEQUENCE_EXPRESSION)
+      return trueExpr();
+    if (expr.getKind() == ElementKind.CONST_EXPRESSION){
+      STPExpr result = trueExpr();
+      ConstantExpression constExpr = (ConstantExpression) expr;
+      String str = constExpr.getString();
+      //TODO encode as a single equals not a conjunction char-by-char
+      for (int i = 0; i < str.length(); i++){
+        int num = encoding.encodedValue(str.charAt(i));
+        STPExpr ch = encoding.extractedChar(i, bv);
+        result = AndExpr.create(this, result, ch.binOp(BinOpKind.EQ_OP, ConstExpr.create(this, num)));
+      }
+      return result;
+    }
+    if (expr.getKind() == ElementKind.CONCAT_EXPRESSION){
+      ConcatExpression ce = (ConcatExpression) expr;
+      List<Expression> subs = ce.getSubexpressions();
+      STPExpr result = trueExpr();
+      int offsetSoFar = 0;
+      for (Expression sub : subs){
+        if (sub.getKind() == ElementKind.CONST_EXPRESSION){
+          ConstantExpression constExpr = (ConstantExpression) sub;
+          String str = constExpr.getString();
+          //TODO encode as a single equals not a conjunction char-by-char
+          for (int i = 0; i < str.length(); i++){
+            int num = encoding.encodedValue(str.charAt(i));
+            STPExpr ch = encoding.extractedChar(i + offsetSoFar, bv);
+            result = AndExpr.create(this, result, ch.binOp(BinOpKind.EQ_OP, ConstExpr.create(this, num)));
+          }
+          offsetSoFar += str.length();
+        }
+        if (sub.getKind() == ElementKind.VAR_EXPRESSION){
+          offsetSoFar += varLen;
+        }
+        if (sub.getKind() == ElementKind.SUBSEQUENCE_EXPRESSION){
+          offsetSoFar += ((SubsequenceExpression) sub).getLength();
+        }
+        if (sub.getKind() == ElementKind.CONCAT_EXPRESSION)
+          throw new IllegalArgumentException("should not have nested concats: " + expr);
+      }
+      return result;
+    }
+    throw new UnsupportedOperationException("not implemented yet " + expr);
   }
 
   //bvlen is in in chars (not bits)
@@ -419,6 +535,8 @@ public class STPSolver extends AbstractSolver{
     }
     throw new UnsupportedOperationException("not implemented yet " + rc);
   }
+
+
 
   /**
    * Create expression that says: suffix of bv starting at startIdx is in

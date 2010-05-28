@@ -85,4 +85,8 @@ public final class HampiConstraints{
     return new SubsequenceExpression(expr, fromIndex, len);
   }
 
+  public static Constraint equalsConstraint(Expression e1, boolean equals, Expression e2){
+    return new EqualsConstraint(e1, equals, e2);
+  }
+
 }

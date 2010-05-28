@@ -309,4 +309,14 @@ boolExpr returns [HBooleanExpression b = null] :
       b = new HContainsExpression(id.getText(), str.getText(), false);
   }
   )
+  | ^(TEQUALS id1=ID id2=ID
+  {
+      b = new HEqualsExpression(id1.getText(), id2.getText(), true);
+  }
+  )
+  | ^(TNOTEQUALS id1=ID id2=ID
+  {
+      b = new HEqualsExpression(id1.getText(), id2.getText(), false);
+  }
+  )
   ;

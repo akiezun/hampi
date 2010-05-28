@@ -99,6 +99,10 @@ public final class Hampi{
     return HampiConstraints.subsequenceExpr(expr, fromIndex, len);
   }
 
+  public Constraint equalsConstraint(Expression e1, boolean equals, Expression e2){
+    return HampiConstraints.equalsConstraint(e1, equals, e2);
+  }
+
   /**
    * Creates a conjunction of constraints.
    */

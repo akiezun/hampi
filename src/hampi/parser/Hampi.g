@@ -15,6 +15,8 @@ grammar Hampi;
 	    CFGOPTION;
 	    CFGSTAR;
 	    CFGPLUS;
+	    TEQUALS;
+	    TNOTEQUALS;
 	    FIX;
 	    CONTAINS;
 	    IN;
@@ -107,6 +109,8 @@ grammar Hampi;
              | (ID KW_CONTAINS STR_LIT) -> ^(CONTAINS ID STR_LIT)
              | (ID KW_NOT KW_IN ID)            -> ^(NOTIN ID ID)
              | (ID KW_NOT KW_CONTAINS STR_LIT) -> ^(NOTCONTAINS ID STR_LIT)
+             | (ID KW_EQUALS ID) -> ^(TEQUALS ID ID)
+             | (ID KW_NOT KW_EQUALS ID) -> ^(TNOTEQUALS ID ID)
              ;
                  
 //Keywords: case sensitive
@@ -123,6 +127,8 @@ KW_IN : 'in' ;
 KW_STAR : 'star' ;
 KW_OR : 'or' ;
 KW_NOT : 'not' ;
+KW_EQUALS : 'equals';
+
 
 // Punctuation
 LPAREN : '(';
@@ -131,6 +137,7 @@ LSQUARE : '[';
 RSQUARE : ']';
 COMMA : ',';	
 EQUALS : '=';
+NOTEQUALS : '!=';
 ASSIGN : ':=';
 SEMI : ';';
 COLON : ':';

@@ -74,4 +74,9 @@ public abstract class ConstraintGrammarVisitor{
     // empty
   }
 
+  public void visitEqualsConstraint(EqualsConstraint equalsConstraint){
+    // empty
+
+  }
+
 }
