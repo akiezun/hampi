@@ -77,4 +77,16 @@ public class SubsequenceExpression extends Expression{
     return len;
   }
 
+  @Override
+  public List<Integer> getVarOffSets(int varLen){
+    return Collections.emptyList();
+  }
+
+  @Override
+  public List<Integer> getSubsequenceOffSets(SubsequenceExpression val, int varLen){
+    if (val.equals(this))
+      return Collections.singletonList(0);
+    else return  Collections.emptyList();
+  }
+
 }

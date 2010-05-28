@@ -45,9 +45,17 @@ public final class HConstraintPreparer{
       return prepareContains((HContainsExpression) boolExpr, ast);
     case BEXPR_IN:
       return prepareIn((HInExpression) boolExpr, ast);
+    case BEXPR_EQUALS:
+      return prepareEquals((HEqualsExpression) boolExpr, ast);
     default:
       throw new IllegalStateException("invalid kind:" + asrt);
     }
+  }
+
+  private Constraint prepareEquals(HEqualsExpression equalExpr, HProgram ast){
+    String leftId = equalExpr.getId1();
+    String rightId = equalExpr.getId2();
+    return hampi.equalsConstraint(getExpandedExpression(leftId, ast), equalExpr.equals(), getExpandedExpression(rightId, ast));
   }
 
   private Constraint prepareContains(HContainsExpression containsExpr, HProgram ast){

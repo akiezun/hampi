@@ -7,6 +7,7 @@ public enum HGrammarElementKind{
   PROGRAM,
   BEXPR_CONTAINS,
   BEXPR_IN,
+  BEXPR_EQUALS,
   CFG_CHAR_RANGE,
   CFG_NONTERMINAL,
   CFG_OPTION,

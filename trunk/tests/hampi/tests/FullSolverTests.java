@@ -204,6 +204,34 @@ public class FullSolverTests extends TestCase{
     doTest(true, Double.MAX_VALUE);
   }
 
+  public void testEquals1() throws Exception{
+    doTest(true, Double.MAX_VALUE);
+  }
+
+  public void testEquals2() throws Exception{
+    doTest(true, Double.MAX_VALUE);
+  }
+
+  public void testEquals3() throws Exception{
+    doTest(true, Double.MAX_VALUE);
+  }
+
+  public void testEquals4() throws Exception{
+    doTest(false, Double.MAX_VALUE);
+  }
+
+  public void testEquals5() throws Exception{
+    doTest(true, Double.MAX_VALUE);
+  }
+
+  public void testEquals6() throws Exception{
+    doTest(true, Double.MAX_VALUE);
+  }
+
+  public void testEquals7() throws Exception{
+    doTest(true, Double.MAX_VALUE);
+  }
+
   public void testMultipleOccurencesOFVariableInConcat() throws Exception{
     doTest(true, Double.MAX_VALUE);
   }

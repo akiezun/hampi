@@ -85,8 +85,8 @@ public final class RegexpConstraint extends Constraint{
   }
 
   @Override
-  public List<RegexpConstraint> getConjuncts(){
-    return Collections.<RegexpConstraint>singletonList(this);
+  public List<Constraint> getConjuncts(){
+    return Collections.<Constraint>singletonList(this);
   }
 
   @Override
@@ -130,5 +130,9 @@ public final class RegexpConstraint extends Constraint{
       return true;
     int expressionSize = getExpression().getSize(varSize);
     return getRegexp().getSizeUpperBound() >= expressionSize && getRegexp().getSizeLowerBound() <= expressionSize;
+  }
+
+  @Override
+  public void removeUnequalSizeEqualities(int varLength){
   }
 }

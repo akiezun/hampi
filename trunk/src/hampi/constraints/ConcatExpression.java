@@ -130,4 +130,53 @@ public final class ConcatExpression extends Expression{
     return sum;
   }
 
+  @Override
+  public List<Integer> getVarOffSets(int varLen){
+    int constLen = 0;
+    List<Integer> offsets = new ArrayList<Integer>();
+    for (Expression sub : subexpressions){
+      if (sub.getKind() == ElementKind.CONST_EXPRESSION){
+        ConstantExpression constExpr = (ConstantExpression) sub;
+        String str = constExpr.getString();
+        constLen += str.length();
+      }
+      if (sub.getKind() == ElementKind.VAR_EXPRESSION){
+        offsets.add(constLen);
+        constLen += varLen;
+      }
+      if (sub.getKind() == ElementKind.SUBSEQUENCE_EXPRESSION){
+        constLen += ((SubsequenceExpression) sub).getLength();
+      }
+      if (sub.getKind() == ElementKind.CONCAT_EXPRESSION)
+        throw new IllegalArgumentException("should not have nested concats: " + this);
+    }
+    return offsets;
+  }
+
+  @Override
+  public List<Integer> getSubsequenceOffSets(SubsequenceExpression val, int varLen){
+    int constLen = 0;
+    List<Integer> offsets = new ArrayList<Integer>();
+    for (Expression sub : subexpressions){
+      if (sub.getKind() == ElementKind.CONST_EXPRESSION){
+        ConstantExpression constExpr = (ConstantExpression) sub;
+        String str = constExpr.getString();
+        constLen += str.length();
+      }
+      if (sub.getKind() == ElementKind.VAR_EXPRESSION){
+        constLen += varLen;
+      }
+      if (sub.getKind() == ElementKind.SUBSEQUENCE_EXPRESSION){
+        SubsequenceExpression subsequenceExpr = (SubsequenceExpression) sub;
+        if (subsequenceExpr.equals(val)){
+          offsets.add(constLen);
+        }
+        constLen += subsequenceExpr.getLength();
+      }
+      if (sub.getKind() == ElementKind.CONCAT_EXPRESSION)
+        throw new IllegalArgumentException("should not have nested concats: " + this);
+    }
+    return offsets;
+  }
+
 }

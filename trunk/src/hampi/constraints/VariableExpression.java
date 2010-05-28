@@ -89,4 +89,14 @@ public final class VariableExpression extends Expression{
   public int getSize(int varSize){
     return varSize;
   }
+
+  @Override
+  public List<Integer> getVarOffSets(int varLen){
+    return Collections.singletonList(0);
+  }
+
+  @Override
+  public List<Integer> getSubsequenceOffSets(SubsequenceExpression val, int varLen){
+    return Collections.emptyList();
+  }
 }

@@ -40,7 +40,7 @@ public final class AndConstraint extends Constraint{
 
   AndConstraint(Collection<Constraint> set){
     super(ElementKind.AND_CONSTRAINT);
-    this.constraints = Collections.unmodifiableSet(new LinkedHashSet<Constraint>(set));
+    this.constraints = new LinkedHashSet<Constraint>(set);
   }
 
   public void addConjunct(Constraint c){
@@ -75,8 +75,8 @@ public final class AndConstraint extends Constraint{
   }
 
   @Override
-  public List<RegexpConstraint> getConjuncts(){
-    List<RegexpConstraint> result = new ArrayList<RegexpConstraint>();
+  public List<Constraint> getConjuncts(){
+    List<Constraint> result = new ArrayList<Constraint>();
     for (Constraint c : constraints){
       result.addAll(c.getConjuncts());
     }
@@ -142,4 +142,18 @@ public final class AndConstraint extends Constraint{
     return true;
   }
 
+  @Override
+  public void removeUnequalSizeEqualities(int varLength){
+    Iterator<Constraint> iter = constraints.iterator();
+    while (iter.hasNext()){
+      Constraint c = iter.next();
+      c.removeUnequalSizeEqualities(varLength);
+      if (c instanceof EqualsConstraint){
+        EqualsConstraint ec = (EqualsConstraint) c;
+        if (!ec.isEqual() && ec.getExpression1().getSize(varLength) != ec.getExpression2().getSize(varLength)){
+          iter.remove();
+        }
+      }
+    }
+  }
 }

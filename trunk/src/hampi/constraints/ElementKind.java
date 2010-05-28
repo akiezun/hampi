@@ -29,6 +29,7 @@ package hampi.constraints;
 public enum ElementKind{
   AND_CONSTRAINT,
   REGEXP_CONSTRAINT,
+  EQUALS_CONSTRAINT,
   CONCAT_EXPRESSION,
   VAR_EXPRESSION,
   CONST_EXPRESSION,

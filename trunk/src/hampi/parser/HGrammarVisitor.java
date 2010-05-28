@@ -106,4 +106,9 @@ public abstract class HGrammarVisitor{
     //empty
   }
 
+  public void visitEqualsExpression(HEqualsExpression hEqualsExpression){
+    // TODO Auto-generated method stub
+
+  }
+
 }
