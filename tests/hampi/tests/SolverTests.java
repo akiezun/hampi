@@ -159,7 +159,7 @@ public class SolverTests extends TestCase{
     System.out.println(c);
     for (Solution sol : solve(h, c, 27, stp())){
       assertTrue(sol.isSatisfiable());
-      assertEquals("< script>alert(1);</script>", sol.getValue(v1));
+      assertTrue("< script>alert(1);</script>".equals(sol.getValue(v1)) || "<script >alert(1);</script>".equals(sol.getValue(v1)));
     }
   }
 

@@ -15,7 +15,7 @@ public class FullSolverTests extends TestCase{
   private static final String PORT = String.valueOf(4444);
   public static final String D = "tests/hampi/tests/";
   private static final boolean IGNORE_TIMES = true;
-  private static final boolean CLIENT = true;
+    private static final boolean CLIENT = false;//true;
   private static final boolean DEBUG = false;//if true, run hampi in the same VM so that you can set up breakpoints
   private static boolean serverRunning = false;
 
