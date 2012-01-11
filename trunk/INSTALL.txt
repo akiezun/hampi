@@ -18,8 +18,11 @@ Make sure the system has Java, Ant, and Perl
 Installation
 ------------
 
+#modify the configure file to use correct Java path for your system
+
 ./configure
-make
+make clean
+make all
 
 Verifying installation
 ----------------------
